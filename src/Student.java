@@ -2,7 +2,7 @@
 // CEN-3024C-24204
 // 02/23/2025
 
-//Student Class:
+// Student Class:
 // Used to define what a kind of information a student will contain.
 // It will be called by the StudentManagement class to perform CRUD operations and the custom action.
 
@@ -28,7 +28,7 @@ public class Student {
         this.isContacted = false;
     }
 
-    //Getters
+    // Getters
 
     public int getId() {
         return id;
@@ -58,7 +58,7 @@ public class Student {
         return isContacted;
     }
 
-    //Setters
+    // Setters
 
     public void setId(int id) {
         this.id = id;
@@ -88,7 +88,7 @@ public class Student {
         isContacted = contacted;
     }
 
-    //toString method is overwritten to display student information.
+    // toString method is overwritten to display student information.
     @Override
     public String toString() {
         return "S" + id + " " + firstName + " " + lastName + " " + phoneNumber + " " + email + " " + gpa + " " + isContacted;
