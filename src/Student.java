@@ -18,7 +18,7 @@ public class Student {
     boolean isContacted;
 
     //Constructor
-    public Student(int id, String firstName, String lastName, String phoneNumber, String email, double gpa) {
+    public Student(int id, String firstName, String lastName, String phoneNumber, String email, double gpa, boolean isContacted) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

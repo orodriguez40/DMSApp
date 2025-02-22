@@ -17,8 +17,8 @@ public class Admin {
 
     // Attributes are instances of the Authenticator, StudentManagement, and UserInput classes.
     private static final Authenticator authencator = new Authenticator();
-    private static StudentManagement studentManagement = new StudentManagement();
-    private static UserInput userInput = new UserInput();
+    private static final StudentManagement studentManagement = new StudentManagement();
+    private static final UserInput userInput = new UserInput();
 
     // Main Method
     public static void main(String[] args) {
