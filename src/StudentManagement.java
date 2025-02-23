@@ -18,7 +18,7 @@ static final List<Student> students = new ArrayList<>();
 public static boolean addStudentManual(Scanner scanner) {
 
     //Attribute to store and return boolean.
-    boolean studentAdded = false;
+    boolean result = false;
 
     // Loop to allow adding multiple Students.
     do {
@@ -47,11 +47,11 @@ public static boolean addStudentManual(Scanner scanner) {
         if (UserInput.userConfirmation(scanner, "\nAre you sure you want to add this Student? y or n: ")) {
             // Add the new Student to the Students Arraylist.
             students.add(new Student(id, firstName, lastName, phoneNumber, email, gpa, isContacted));
-            studentAdded = true; // Mark that a student was added
-            System.out.println("\nResult = " + studentAdded);
+            result = true; // Mark that a student was added
+            System.out.println("\nResult: " + result);
             System.out.println("\nStudent added successfully!");
         } else {
-            System.out.println("\nResult = " + studentAdded);
+            System.out.println("\nResult: " + result);
             System.out.println("\nStudent not added.");
         }
 
@@ -59,6 +59,18 @@ public static boolean addStudentManual(Scanner scanner) {
     } while (UserInput.userConfirmation(scanner, "\nWould you like to add another student? y or n:\n"));
 
     System.out.println("\nReturning to the main menu.");
-    return studentAdded;
-}
+    return result;
+    }
+
+    // Method is called to add students by file upload.
+    public static void addStudentFile(Scanner scanner) {
+        // Prompt user for the file location.
+        System.out.print("\nEnter the file path for the student list:\n");
+        System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n ");
+        String filePath = scanner.nextLine().trim();
+
+        // Create FileHandler class instance to process the file.
+        FileHandler fileUpload = new FileHandler();
+        fileUpload.addStudentsByFile(filePath, students, scanner); // Add students from the file.
+    }
 }
