@@ -224,6 +224,6 @@ public class FileHandler {
         } catch (IOException e) {
             System.out.println("\nError reading the file. Please check the file path and try again.");
         }
-        return true; // Modify to indicate completion without early exit
+        return true; // Modify to indicate completion without early exit.
     }
 }

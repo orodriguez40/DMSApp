@@ -3,7 +3,7 @@
 // 02/23/2025
 
 // StudentManagement Class:
-// This class manages all functions related to Students.
+// This class manages all CRUD functions related to Students.
 
 //Imported Library
 import java.util.*;
@@ -276,7 +276,7 @@ public class StudentManagement {
             }
         }
         System.out.println("Returning to the main menu.");
-        return true; // Return true after viewing students
+        return true; // Return true after viewing students.
     }
 
     // Method to display students who have not been contacted and calculate GPA improvement

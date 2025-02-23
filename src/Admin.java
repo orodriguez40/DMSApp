@@ -6,7 +6,7 @@
 // This is where the DMS application will run.
 // The user will open the JAR file through the CLI.
 // They will have options to add a student manually or by file,
-// remove a student based on their ID, view all students,
+// remove a student based on their ID, view students,
 // update student information, perform the custom action,
 // or close the application.
 

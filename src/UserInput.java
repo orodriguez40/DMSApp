@@ -39,7 +39,7 @@ public class UserInput {
         while (true) {
             System.out.print("ID: ");
             String input = scanner.nextLine().trim();
-            if (input.matches("\\d{8}") && Integer.parseInt(input) >= 10000000) { // Check if the input is a 8-digit number and >= 10000000
+            if (input.matches("\\d{8}") && Integer.parseInt(input) >= 10000000) { // Check if the input is an 8-digit number and >= 10000000
                 id = Integer.parseInt(input);
 
                 // Checks if the ID is unique.
@@ -122,7 +122,7 @@ public class UserInput {
                 String finalEmail = input;
                 if (StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), finalEmail))) {
 
-                    return finalEmail; // Valid input, return it
+                    return finalEmail; // Valid input, return it.
                 } else {
                     System.out.println("Invalid input. Email must be unique (format example@gmail.com).");
                 }
@@ -140,15 +140,15 @@ public class UserInput {
             System.out.print("GPA: ");
             if (scanner.hasNextDouble()) {
                 gpa = scanner.nextDouble();
-                scanner.nextLine(); // Clears the line
+                scanner.nextLine(); // Clears the line.
                 if (gpa >= 0 && gpa <= 1.9) {
-                    return gpa; // Return the valid amount
+                    return gpa; // Return the valid amount.
                 } else {
                     System.out.print("Please try again. GPA must be between 0 and 1.9.\n");
                 }
             } else {
                 System.out.print("Invalid Input. Please enter a valid number: ");
-                scanner.nextLine(); // Clears invalid input
+                scanner.nextLine(); // Clears invalid input.
             }
         }
     }
@@ -180,7 +180,7 @@ public class UserInput {
 
     // Method is called to get confirmation from the user.
     public static boolean userConfirmation(Scanner scanner, String message) {
-        // Loop until we get a valid response from the user
+        // Loop until we get a valid response from the user.
         while (true) {
             // Prompt the user with the provided message.
             System.out.print(message);
