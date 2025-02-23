@@ -8,6 +8,7 @@
 
 //Imported Libraries
 import java.util.InputMismatchException;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class UserInput {
@@ -99,12 +100,12 @@ public class UserInput {
 
             // Validate phone number format: (XXX) XXX-XXXX
             if (input.matches("\\(\\d{3}\\) \\d{3}-\\d{4}")) {
-                return input; // Valid input, return it
-            } else {
-                System.out.println("Invalid input. Phone number must be 10 digits and in the format (555) 555-5555.");
+                return input;
+                } else {
+                    System.out.println("Invalid input. Phone number must be 10 digits and in the format (555) 555-5555.");
+                }
             }
         }
-    }
 
     // Method is called to get the email address input from the user.
     public static String emailInput(Scanner scanner, String prompt) {
@@ -117,9 +118,14 @@ public class UserInput {
 
             // Validate email format: example@gmail.com
             if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-                return input; // Valid input, return it
-            } else {
-                System.out.println("Invalid input. Email must be in the format example@gmail.com.");
+                // Checks if the email is unique.
+                String finalEmail = input;
+                if (StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), finalEmail))) {
+
+                    return finalEmail; // Valid input, return it
+                } else {
+                    System.out.println("Invalid input. Email must be in the format example@gmail.com.");
+                }
             }
         }
     }
@@ -146,9 +152,9 @@ public class UserInput {
     }
 
     // Method is called to get a valid student ID to delete.
-    public static int studentIdDelete(Scanner scanner) {
+    public static int studentIdSearch(Scanner scanner) {
         while (true) {
-            System.out.print("Enter student ID to remove: ");
+            System.out.print("Enter student ID: ");
             String input = scanner.nextLine().trim().toLowerCase();
 
             // Checks ID to be the specified range.

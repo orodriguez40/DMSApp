@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class FileHandler {
 
     // Method is called to read and process file.
-    public void addStudentsByFile(String filePath, List<Student> students, Scanner scanner) {
+    public boolean addStudentsByFile(String filePath, List<Student> students, Scanner scanner) {
         // BufferedReader will attempt to read the file.
         try (BufferedReader readFile = new BufferedReader(new FileReader(filePath))) {
             // Lists to track invalid entries based on the issue type.
@@ -224,5 +224,6 @@ public class FileHandler {
         } catch (IOException e) {
             System.out.println("\nError reading the file. Please check the file path and try again.");
         }
+        return true; // Modify to indicate completion without early exit
     }
 }

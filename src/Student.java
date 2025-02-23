@@ -54,7 +54,7 @@ public class Student {
         return gpa;
     }
 
-    public boolean isContacted() {
+    public boolean getIsContacted() {
         return isContacted;
     }
 
@@ -91,6 +91,11 @@ public class Student {
     // toString method is overwritten to display student information.
     @Override
     public String toString() {
-        return "S" + id + " " + firstName + " " + lastName + " " + phoneNumber + " " + email + " " + gpa + " " + isContacted;
+        return "\nID: S" + id +
+                "\nName: " + firstName + " " + lastName +
+                "\nPhone Number: " + phoneNumber +
+                "\nEmail: " + email +
+                "\nGPA: " + gpa +
+                "\nContacted: " + isContacted + "\n";
     }
 }
