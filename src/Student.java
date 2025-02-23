@@ -25,7 +25,7 @@ public class Student {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.gpa = gpa;
-        this.isContacted = false;
+        this.isContacted = isContacted;
     }
 
     // Getters

@@ -23,12 +23,12 @@ public class Authenticator {
         System.out.print("Enter password: ");
         String password = scanner.nextLine().trim();
 
-        // Check if the entered credentials match the valid ones
+        // Check if the entered credentials match the valid ones.
         if (username.equals(validUsername) && password.equals(validPassword)) {
-            System.out.println("Login successful! Welcome to the DMS.");
-            return true; // Authentication successful
+            System.out.println("\nLogin successful! Welcome to the DMS.");
+            return true; // Authentication successful.
         } else {
-            return false; // Authentication failed
+            return false; // Authentication failed.
         }
     }
 }

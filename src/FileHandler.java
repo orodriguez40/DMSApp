@@ -35,7 +35,7 @@ public class FileHandler {
             // Reads rows from the text file.
             String row;
             while ((row = readFile.readLine()) != null) {
-                String[] details = row.split("-");
+                String[] details = row.split(" ");
                 if (details.length != 7) {
                     invalidEntries.add(row);
                     continue;
@@ -69,14 +69,14 @@ public class FileHandler {
 
                     // Checks phone number format (xxx) xxx-xxxx
                     String phoneNumber = details[3].trim();
-                    if (!phoneNumber.matches("\\(\\d{3}\\) \\d{3}-\\d{4}")) {
+                    if (!phoneNumber.matches("\\(\\d{3}\\)\\s?\\d{3}-\\d{4}") || !phoneNumber.matches("\\(\\d{3}\\)\\d{3}-\\d{4}")) {
                         invalidPhoneNumbers.add(row);
                         continue;
                     }
 
                     // Checks email format and uniqueness.
                     String email = details[4].trim();
-                    if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                    if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
                         invalidEmails.add(row);
                         continue;
                     }
@@ -146,7 +146,7 @@ public class FileHandler {
             if (validStudents.isEmpty()) {
                 System.out.println("\nNo valid students found.");
             } else {
-                System.out.println("\nValid students to be added:\n");
+                System.out.println("\nValid students to be added:");
                 validStudents.forEach(System.out::println);
 
                 // User confirmation to add students
@@ -160,13 +160,13 @@ public class FileHandler {
 
             // Display duplicate IDs.
             if (!allDuplicateIDs.isEmpty()) {
-                System.out.println("\nDuplicate IDs found (skipped):\n");
+                System.out.println("\nDuplicate IDs found (rows containing these values are skipped):\n");
                 allDuplicateIDs.forEach(System.out::println);
             }
 
             // Display duplicate emails.
             if (!allDuplicateEmails.isEmpty()) {
-                System.out.println("\nDuplicate emails found (skipped):\n");
+                System.out.println("\nDuplicate emails found (rows containing these values are skipped):\n");
                 allDuplicateEmails.forEach(System.out::println);
             }
 
@@ -175,45 +175,45 @@ public class FileHandler {
                     !invalidLastNames.isEmpty() || !invalidPhoneNumbers.isEmpty() || !invalidEmails.isEmpty() ||
                     !invalidGPA.isEmpty() || !invalidContacted.isEmpty()) {
 
-                System.out.println("\nInvalid entries detected and skipped:\n");
+                System.out.println("\nInvalid entries detected and skipped:");
 
                 if (!invalidIDs.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid IDs (must be exactly 8 digits) and were skipped:");
+                    System.out.println("\nThe following entries have invalid IDs (must be exactly 8 digits and start with a 1):");
                     invalidIDs.forEach(rows -> System.out.println("Invalid ID: " + rows));
                 }
 
                 if (!invalidFirstNames.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid first names and were skipped:");
+                    System.out.println("\nThe following entries have invalid first names:");
                     invalidFirstNames.forEach(rows -> System.out.println("Invalid First Name: " + rows));
                 }
 
                 if (!invalidLastNames.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid last names and were skipped:");
+                    System.out.println("\nThe following entries have invalid last names:");
                     invalidLastNames.forEach(rows -> System.out.println("Invalid Last Name: " + rows));
                 }
 
                 if (!invalidPhoneNumbers.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid phone numbers and were skipped:");
+                    System.out.println("\nThe following entries have invalid phone numbers(must follow (xxx)xxx-xxxx format):");
                     invalidPhoneNumbers.forEach(rows -> System.out.println("Invalid Phone Number: " + rows));
                 }
 
                 if (!invalidEmails.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid emails and were skipped:");
+                    System.out.println("\nThe following entries have invalid emails (must be unique and follow example@example.com format):");
                     invalidEmails.forEach(rows -> System.out.println("Invalid Email: " + rows));
                 }
 
                 if (!invalidGPA.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid GPAs (must be between 0 and 1.9) and were skipped:");
+                    System.out.println("\nThe following entries have invalid GPAs (must be between 0 and 1.9):");
                     invalidGPA.forEach(rows -> System.out.println("Invalid GPA: " + rows));
                 }
 
                 if (!invalidContacted.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid contacted status and were skipped:");
+                    System.out.println("\nThe following entries have invalid contacted status:");
                     invalidContacted.forEach(rows -> System.out.println("Invalid Contacted Status: " + rows));
                 }
 
                 if (!invalidEntries.isEmpty()) {
-                    System.out.println("\nThe following entries have incorrect formatting and were skipped:");
+                    System.out.println("\nThe following entries have incorrect formatting:");
                     invalidEntries.forEach(rows -> System.out.println("Invalid Formatting: " + rows));
                 }
 

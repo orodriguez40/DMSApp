@@ -31,7 +31,7 @@ public class Admin {
         int userChoice;
 
         // Welcome message for the user.
-        System.out.println("Welcome to the Success University DMS student outreach application!");
+        System.out.println("\nWelcome to the Success University DMS student outreach application!");
 
         // Authenticate user before accessing the menu.
         while (!authenticator.authenticate(scanner)) {
@@ -61,19 +61,22 @@ public class Admin {
                     studentManagement.updateStudent(scanner); // Updates any student information.
                     break;
                 case 5:
-                    studentManagement.viewAllStudents(); // View all students.
+                    studentManagement.viewStudent(scanner); // View specified student.
                     break;
                 case 6:
-                    studentManagement.notContacted(); // View all students who have not been contacted and calculates their GPA.
+                    studentManagement.viewAllStudents(); // View all students.
                     break;
                 case 7:
-                    System.out.println("Thank you for using the Success University's DMS application. Goodbye!"); // Message when user chooses to close application.
+                    studentManagement.notContacted(); // View all students who have not been contacted and calculates their GPA.
+                    break;
+                case 8:
+                    System.out.println("Thank you for using the Success University's DMS application. Goodbye!\n"); // Message when user chooses to close application.
                     break;
                 default:
-                    System.out.println("Invalid option. Please enter a number from 1 to 7."); // Checks for invalid user input.
+                    System.out.println("Invalid option. Please enter a number from 1 to 8."); // Checks for invalid user input.
                     break;
             }
-        } while (userChoice != 7); // Continue looping until the user chooses to exit.
+        } while (userChoice != 8); // Continue looping until the user chooses to exit.
 
         scanner.close(); // Closes the scanner instance.
     }
@@ -86,8 +89,9 @@ public class Admin {
         System.out.println("Enter 2 to add student(s) by file upload");
         System.out.println("Enter 3 to remove a student");
         System.out.println("Enter 4 to update student information");
-        System.out.println("Enter 5 to view all students");
-        System.out.println("Enter 6 to view students who have not been contacted and calculate their GPA");
-        System.out.println("Enter 7 to exit the application");
+        System.out.println("Enter 5 to search for student");
+        System.out.println("Enter 6 to view all students");
+        System.out.println("Enter 7 to view students who have not been contacted and calculate their GPA");
+        System.out.println("Enter 8 to exit the application");
     }
 }

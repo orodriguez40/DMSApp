@@ -20,10 +20,10 @@ public class UserInput {
                 // Get user input and validate it.
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Clears the buffer.
-                if (choice >= 1 && choice <= 7) {
+                if (choice >= 1 && choice <= 8) {
                     return choice; // Return valid input.
                 }
-                System.out.println("Please try again. Select a number between 1 and 7."); // Error message for invalid numeric input.
+                System.out.println("Please try again. Select a valid number."); // Error message for invalid numeric input.
             } catch (InputMismatchException e) {
                 System.out.println("Please try again. Input must be a number."); // Error message for non-numeric input.
                 scanner.nextLine(); // Clears invalid input.
@@ -99,7 +99,7 @@ public class UserInput {
             input = scanner.nextLine().trim(); // Read and trim input
 
             // Validate phone number format: (XXX) XXX-XXXX
-            if (input.matches("\\(\\d{3}\\) \\d{3}-\\d{4}")) {
+            if (input.matches("\\(\\d{3}\\)\\s?\\d{3}-\\d{4}" ) || input.matches("\\(\\d{3}\\)\\d{3}-\\d{4}")) {
                 return input;
                 } else {
                     System.out.println("Invalid input. Phone number must be 10 digits and in the format (555) 555-5555.");
@@ -117,15 +117,17 @@ public class UserInput {
             input = scanner.nextLine().trim(); // Read and trim input
 
             // Validate email format: example@gmail.com
-            if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
                 // Checks if the email is unique.
                 String finalEmail = input;
                 if (StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), finalEmail))) {
 
                     return finalEmail; // Valid input, return it
                 } else {
-                    System.out.println("Invalid input. Email must be in the format example@gmail.com.");
+                    System.out.println("Invalid input. Email must be unique (format example@gmail.com).");
                 }
+            } else {
+                System.out.println("Invalid input. Email must be in the format (example@gmail.com).");
             }
         }
     }
