@@ -1,9 +1,8 @@
 # Success University Outreach DMS
 
-## Developer/Presenter  
+## Developer  
 **Otoniel Rodriguez-Perez**  
-
-## Class Information  
+ 
 - **Class:** CEN-3024C  
 - **CRN:** 24204  
 - **Date:** 02/23/2025  
@@ -49,15 +48,4 @@ The **Success University Outreach DMS** is a **Data Management System (DMS)** de
 - **Student Search:** Find students by ID.  
 - **Outreach Tracking:** Identify students who need outreach & calculate required GPA.  
 
----
-
-## UML & User Stories  
-### UML Use Case Diagrams  
-- Use case diagrams illustrate system functionalities.  
-
-### User Stories  
-- As an **outreach specialist**, I want to manually enter student information to track outreach efforts.  
-- As an **outreach specialist**, I want to upload a text file of student lists to avoid manual entry.  
-- As an **outreach specialist**, I want to view a list of students needing outreach.  
-- As an **outreach specialist**, I want to update or remove student information when necessary.  
 
