@@ -1,7 +1,3 @@
-// Otoniel Rodriguez-Perez
-// CEN-3024C-24204
-// 02/23/2025
-
 // Admin Class (Main Application):
 // This is where the DMS application will run.
 // The user will open the JAR file through the CLI.
@@ -11,6 +7,7 @@
 // or close the application.
 
 // Imported Library
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Admin {
@@ -19,16 +16,16 @@ public class Admin {
     public static void main(String[] args) {
 
         // Attributes are instances of the Authenticator, StudentManagement, and UserInput classes.
-         Authenticator authenticator = new Authenticator();
-         StudentManagement studentManagement = new StudentManagement();
-         UserInput userInput = new UserInput();
+        Authenticator authenticator = new Authenticator();
+        StudentManagement studentManagement = new StudentManagement();
+        UserInput userInput = new UserInput();
 
         // Create an instance of Admin to access non-static methods.
         Admin admin = new Admin();
 
         // Scanner is used to accept all user input.
         Scanner scanner = new Scanner(System.in);
-        int userChoice;
+        int userChoice = 0;
 
         // Welcome message for the user.
         System.out.println("\nWelcome to the Success University DMS student outreach application!");
@@ -43,38 +40,45 @@ public class Admin {
             // Display the main menu options.
             admin.viewMenu();
             // Calls method to verify user input.
-            System.out.println("\nEnter choice:");
-            userChoice = userInput.usersChoice(scanner);
+            try {
+                System.out.println("\nEnter choice:");
+                userChoice = userInput.usersChoice(scanner);
 
-            // Switch statement to handle user choices.
-            switch (userChoice) {
-                case 1:
-                    studentManagement.addStudentManual(scanner); // Adds a student manually.
-                    break;
-                case 2:
-                    studentManagement.addStudentFile(scanner); // Add student(s) by file upload.
-                    break;
-                case 3:
-                    studentManagement.removeStudent(scanner); // Removes a student.
-                    break;
-                case 4:
-                    studentManagement.updateStudent(scanner); // Updates any student information.
-                    break;
-                case 5:
-                    studentManagement.viewStudent(scanner); // View specified student.
-                    break;
-                case 6:
-                    studentManagement.viewAllStudents(); // View all students.
-                    break;
-                case 7:
-                    studentManagement.notContacted(); // View all students who have not been contacted and calculates their GPA.
-                    break;
-                case 8:
-                    System.out.println("Thank you for using the Success University's DMS application. Goodbye!\n"); // Message when user chooses to close application.
-                    break;
-                default:
-                    System.out.println("Invalid option. Please enter a number from 1 to 8."); // Checks for invalid user input.
-                    break;
+                // Switch statement to handle user choices.
+                switch (userChoice) {
+                    case 1:
+                        studentManagement.addStudentManual(scanner); // Adds a student manually.
+                        break;
+                    case 2:
+                        studentManagement.addStudentFile(scanner); // Add student(s) by file upload.
+                        break;
+                    case 3:
+                        studentManagement.removeStudent(scanner); // Removes a student.
+                        break;
+                    case 4:
+                        studentManagement.updateStudent(scanner); // Updates any student information.
+                        break;
+                    case 5:
+                        studentManagement.viewStudent(scanner); // View specified student.
+                        break;
+                    case 6:
+                        studentManagement.viewAllStudents(); // View all students.
+                        break;
+                    case 7:
+                        studentManagement.notContacted(); // View all students who have not been contacted and calculates their GPA.
+                        break;
+                    case 8:
+                        System.out.println("Thank you for using the Success University's DMS application. Goodbye!\n"); // Message when user chooses to close application.
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please enter a number from 1 to 8."); // Checks for invalid user input.
+                        break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Clear the invalid input
+            } catch (Exception e) {
+                System.out.println("An unexpected error occurred: " + e.getMessage());
             }
         } while (userChoice != 8); // Continue looping until the user chooses to exit.
 

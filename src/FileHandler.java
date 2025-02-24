@@ -216,13 +216,14 @@ public class FileHandler {
                     System.out.println("\nThe following entries have incorrect formatting:");
                     invalidEntries.forEach(rows -> System.out.println("Invalid Formatting: " + rows));
                 }
-
             }
 
             System.out.println("\nFile processing complete. Returning to the main menu.");
 
         } catch (IOException e) {
             System.out.println("\nError reading the file. Please check the file path and try again.");
+        } catch (Exception e) {
+            System.out.println("\nAn unexpected error occurred: " + e.getMessage());
         }
         return true; // Modify to indicate completion without early exit.
     }
