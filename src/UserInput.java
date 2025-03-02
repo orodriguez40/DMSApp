@@ -37,22 +37,36 @@ public class UserInput {
         }
     }
 
-    //Method is called to collect student information and calls the appropiate methods.
+    // Method is called to collect student information and calls the appropriate methods.
     public static Student getStudentInfo(Scanner scanner) {
-
-        // Loop to allow adding multiple Students.
         do {
             try {
                 System.out.println("Please enter the following Student information:\n");
 
                 // Get Student information through the user's input.
                 int id = manualIdInput(scanner); // Get a unique ID for the Student.
+                if (id == -1) return null; // Exit if ID input fails.
+
                 String firstName = firstNameInput(scanner, "First Name: "); // Get Student's first name.
+                if (firstName == null) return null; // Exit if first name input fails.
+
                 String lastName = lastNameInput(scanner, "Last Name: "); // Get Student's last name.
+                if (lastName == null) return null; // Exit if last name input fails.
+
                 String phoneNumber = phoneNumberInput(scanner, "Phone Number (Format (555) 555-5555): "); // Get Student's phone number.
+                if (phoneNumber == null) return null; // Exit if phone number input fails.
+
                 String email = emailInput(scanner, "Email (Format example@gmail.com): "); // Get Student's email address.
+                if (email == null) return null; // Exit if email input fails.
+
                 double gpa = gpaInput(scanner); // Get the Student's GPA.
-                boolean isContacted = userConfirmation(scanner, "Has the student been contacted? y or n: "); //
+                if (gpa == -1) return null; // Exit if GPA input fails.
+
+                // Ensure valid input for isContacted
+                Boolean isContacted = userConfirmation(scanner, "Has the student been contacted? (y/n): ");
+                if (isContacted == null) {  // Check if null, exit if failed.
+                    return null;
+                }
 
                 // Student information will be displayed before confirming.
                 System.out.print("\nPlease verify information is correct:\n");
@@ -64,12 +78,14 @@ public class UserInput {
                         "\nContacted: " + isContacted);
 
                 // Asks user to confirm if they want to add Student.
-                if (UserInput.userConfirmation(scanner, "\nAre you sure you want to add this Student? y or n: ")) {
-                    // Add the new Student to the Students ArrayList.
-                    return new Student(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
-                } else {
+                Boolean confirmation = UserInput.userConfirmation(scanner, "\nAre you sure you want to add this Student? (y/n): ");
+                if (confirmation == null || !confirmation) {  // Check if confirmation is null or false
                     return null;
                 }
+
+                // Add the new Student to the Students ArrayList.
+                return new Student(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
+
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter the correct data type.");
                 scanner.nextLine(); // Clear the invalid input
@@ -82,14 +98,17 @@ public class UserInput {
             }
 
             // Ask if the user wants to add another Student.
-        } while (UserInput.userConfirmation(scanner, "\nWould you like to add another student? y or n:\n"));
+        } while (UserInput.userConfirmation(scanner, "\nWould you like to add another student? (y/n): ") != null
+                && UserInput.userConfirmation(scanner, "\nWould you like to add another student? (y/n): "));
+
         System.out.println("\nReturning to the main menu.");
         return null;
     }
 
     // Method to get a patron ID from user input.
     public static int manualIdInput(Scanner scanner) {
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print("ID: ");
                 String input = scanner.nextLine().trim();
@@ -112,12 +131,16 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
+            attempts++;
         }
+        System.out.println(" \nMaximum attempts reached.");
+        return -1; // Indicates failure.
     }
 
     // Method is called to verify first and last name inputs from the user.
     public static String validateString(Scanner scanner, String prompt, int maxLength) {
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print(prompt);
                 String input = scanner.nextLine().trim();
@@ -133,7 +156,10 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return null; // Indicates failure.
     }
 
     // Methods are called to verify string length for first and last names.
@@ -145,9 +171,11 @@ public class UserInput {
         return validateString(scanner, prompt, 25);
     }
 
+
     // Method is called to enter and verify phone number format entered by the user.
     public static String phoneNumberInput(Scanner scanner, String prompt) {
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print(prompt);
                 String input = scanner.nextLine().trim();
@@ -163,16 +191,21 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return null; // Indicate failure
     }
 
-    // Method is called to check for unique and correctly formated email entered by the user.
+
+    // Method is called to check for unique and correctly formatted email entered by the user.
     public static String emailInput(Scanner scanner, String prompt) {
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print(prompt);
                 String input = scanner.nextLine().trim();
-                if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
+                if (input.matches("^[A-Za-z][A-Za-z0-9._-]*(?<![._-])@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
                     if (StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), input))) {
                         return input; // Valid email.
                     } else {
@@ -188,12 +221,16 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return null; // Indicates failure.
     }
 
     // Method is called to check for a valid GPA entered by the user.
     public static double gpaInput(Scanner scanner) {
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print("GPA: ");
                 if (scanner.hasNextDouble()) {
@@ -215,13 +252,17 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return -1; // Indicates failure.
     }
 
     // Method to collect the file path from the user for the text file containing student information.
     public static String getFileInfo(Scanner scanner) {
         String filePath;
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             System.out.print("\nEnter the file path for the student list (or type 'exit' to return to the main menu):\n");
             System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n");
 
@@ -229,7 +270,7 @@ public class UserInput {
 
             // Check that user enters exit.
             if (filePath.equalsIgnoreCase("exit")) {
-                System.out.println("\nFile uplaod cancelled.");
+                System.out.println("\nFile upload cancelled.");
                 return null; // Return null to indicate cancellation without any message.
             }
 
@@ -239,7 +280,10 @@ public class UserInput {
             } else {
                 System.out.println("Invalid file path. Please check and try again.");
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return null; // Indicate failure
     }
 
 
@@ -256,7 +300,8 @@ public class UserInput {
 
     // Method searches for a student based on their ID, displays the information, and returns the student.
     public static Student searchStudentByID(Scanner scanner) {
-        while (true) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print("Enter student ID: ");
                 String input = scanner.nextLine().trim();
@@ -293,7 +338,7 @@ public class UserInput {
                 }
             } catch (NumberFormatException e) {
                 // Invalid input. Please enter a valid 8-digit number.
-                System.out.println("Invalid input. Please enter a valid 8-digit number.xclude the 'S' in the ID.");
+                System.out.println("Invalid input. Please enter a valid 8-digit number (exclude the 'S' in the ID).");
             } catch (NoSuchElementException | IllegalStateException e) {
                 // Unexpected input issue. Please try again.
                 System.out.println("Unexpected input issue. Please try again.");
@@ -303,12 +348,17 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in); // Reinitialize scanner to avoid issues
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return null; // Indicate failure
     }
 
+
     // Method is called to confirm user's choice when performing CRUD operations or the Custom Action.
-    public static boolean userConfirmation(Scanner scanner, String message) {
-        while (true) {
+    public static Boolean userConfirmation(Scanner scanner, String message) {
+        int attempts = 0;
+        while (attempts < 3) {
             try {
                 System.out.print(message);
                 String choice = scanner.nextLine().trim().toLowerCase();
@@ -326,7 +376,10 @@ public class UserInput {
                 System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
+            attempts++;
         }
+        System.out.println("\nMaximum attempts reached.");
+        return null; // Indicate failure
     }
 
     // Method is called to confirm deletion of a student.

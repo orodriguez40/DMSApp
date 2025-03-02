@@ -19,8 +19,9 @@ public class Authenticator {
         // Ask user for username and password.
         String username = "";
         String password = "";
+        int attempts = 0; // Counter for attempts
 
-        while (true) {
+        while (attempts < 3) {
             try {
                 System.out.print("Enter username: ");
                 username = scanner.nextLine().trim();
@@ -35,7 +36,7 @@ public class Authenticator {
                     System.out.println("\nLogin successful! Welcome to the DMS.");
                     return true; // Authentication successful.
                 } else {
-                    System.out.println("Invalid username or password. Please try again.");
+                    System.out.println("Invalid username or password.");
                 }
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -46,6 +47,18 @@ public class Authenticator {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
                 scanner = new Scanner(System.in); // Reinitialize scanner for retry.
             }
+            attempts++; // Increment attempts
         }
+
+        // Notify the user of maximum attempts failure
+        System.out.println("\nMaximum attempts reached.");
+        exitProgram(); // Call to exit the program.
+        return false; // Authentication failed.
+    }
+
+    // Method to exit the program
+    public void exitProgram() {
+        System.out.println("Terminating DMS application.\n");
+        System.exit(0); // Terminates the program.
     }
 }

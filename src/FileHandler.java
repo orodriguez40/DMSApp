@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class FileHandler {
 
     // Method is called to read and process file.
-    // Method is called to read and process file.
     public boolean addStudentsByFile(String filePath, List<Student> students, Scanner scanner) {
         // BufferedReader will attempt to read the file.
         try (BufferedReader readFile = new BufferedReader(new FileReader(filePath))) {
@@ -77,7 +76,7 @@ public class FileHandler {
 
                     // Checks email format and uniqueness.
                     String email = details[4].trim();
-                    if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
+                    if (!email.matches("^[A-Za-z][A-Za-z0-9._-]*(?<![._-])@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
                         invalidEmails.add(row);
                         continue;
                     }
@@ -144,36 +143,6 @@ public class FileHandler {
             validStudents.removeIf(student -> allDuplicateIDs.contains(student.getId()) || allDuplicateEmails.contains(student.getEmail()));
 
             // Display results.
-            if (validStudents.isEmpty()) {
-                System.out.println("\nNo valid students found.");
-            } else {
-                System.out.println("\nValid students to be added:");
-                validStudents.forEach(System.out::println);
-
-                // User confirmation to add students
-                if (UserInput.userConfirmation(scanner, "Are you sure you want to add these students? (y/n): ")) {
-                    students.addAll(validStudents);
-                    System.out.println("\nStudents added successfully!");
-                    return true;
-                } else {
-                    System.out.println("\nNo students were added.");
-                    return false;
-                }
-            }
-
-            // Display duplicate IDs.
-            if (!allDuplicateIDs.isEmpty()) {
-                System.out.println("\nDuplicate IDs found (rows containing these values are skipped):");
-                allDuplicateIDs.forEach(System.out::println);
-            }
-
-            // Display duplicate emails.
-            if (!allDuplicateEmails.isEmpty()) {
-                System.out.println("\nDuplicate emails found (rows containing these values are skipped):");
-                allDuplicateEmails.forEach(System.out::println);
-            }
-
-            // Display invalid entries.
             if (!invalidEntries.isEmpty() || !invalidIDs.isEmpty() || !invalidFirstNames.isEmpty() ||
                     !invalidLastNames.isEmpty() || !invalidPhoneNumbers.isEmpty() || !invalidEmails.isEmpty() ||
                     !invalidGPA.isEmpty() || !invalidContacted.isEmpty()) {
@@ -218,6 +187,50 @@ public class FileHandler {
                 if (!invalidEntries.isEmpty()) {
                     System.out.println("\nThe following entries have incorrect formatting:");
                     invalidEntries.forEach(rows -> System.out.println("Invalid Formatting: " + rows));
+                }
+            }
+
+            // Display duplicate IDs.
+            if (!allDuplicateIDs.isEmpty()) {
+                System.out.println("\nDuplicate IDs found (rows containing these values are skipped):");
+                allDuplicateIDs.forEach(System.out::println);
+            }
+
+            // Display duplicate emails.
+            if (!allDuplicateEmails.isEmpty()) {
+                System.out.println("\nDuplicate emails found (rows containing these values are skipped):");
+                allDuplicateEmails.forEach(System.out::println);
+            }
+
+            // Check for valid students
+            if (validStudents.isEmpty()) {
+                System.out.println("\nNo valid students found.");
+            } else {
+                System.out.println("\nValid students to be added:");
+                validStudents.forEach(System.out::println);
+
+                // User confirmation to add students
+                try {
+                    // Method is called to confirm if the user wants to add the students.
+                    Boolean confirmation = UserInput.userConfirmation(scanner, "Are you sure you want to add these students? (y/n): ");
+
+                    // If the confirmation is null, it means the user input was invalid after 3 attempts.
+                    if (confirmation == null) {
+                        System.out.println("Invalid input. Returning to the main menu.");
+                        return false;  // Exit the method and return false
+                    } else if (confirmation) {
+                        students.addAll(validStudents);  // Add valid students if confirmation is true
+                        System.out.println("\nStudents added successfully!");  // Success message
+                        return true;  // Proceed with adding the students
+                    } else {
+                        System.out.println("\nNo students were added.");  // No students were added if confirmation is false
+                        return false;  // Return false, no action taken
+                    }
+
+                } catch (Exception e) {
+                    // Catch any unexpected errors
+                    System.out.println("An unexpected error occurred: " + e.getMessage());
+                    return false;  // Return false in case of any unexpected error
                 }
             }
 

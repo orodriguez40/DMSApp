@@ -22,7 +22,7 @@ public class StudentManagement {
                 System.out.println("\nStudent added successfully!");
                 return true; // Successfully added student.
             } else {
-                System.out.println("Student not added.");
+                System.out.println("Student not added. Returning to the main menu");
                 return false; // Student not added.
             }
     }
@@ -37,7 +37,7 @@ public class StudentManagement {
                 return true; // File processed successfully.
             }
         } else {
-            System.out.println("\nReturning to the main menu.");
+            System.out.println("Returning to the main menu.");
             return false; // File path was invalid or user chooses not to upload file.
         }
         return false;
@@ -68,7 +68,7 @@ public class StudentManagement {
     }
 
 
-    // Method is called ot update student information.
+    // Method is called to update student information.
     public boolean updateStudent(Student updateStudent) {
         // Attribute to store user's choice for the update menu.
         int userChoice;
@@ -101,62 +101,87 @@ public class StudentManagement {
                         switch (userChoice) {
                             case 1:
                                 int id = UserInput.manualIdInput(scanner); // Updates student's ID.
-                                updateStudent.setId(id);
-                                // Print updated student details after each successful update.
-                                System.out.println("\nUpdated student details:");
-                                System.out.println(updateStudent);
-                                System.out.println("Returning to the update menu.");
-                                isUpdated = true; // Mark as updated
+                                if (id != -1) { // Check for valid ID input.
+                                    updateStudent.setId(id);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. ID was not updated.");
+                                }
                                 break;
                             case 2:
                                 String firstName = UserInput.firstNameInput(scanner, "First name: "); // Updates first name.
-                                updateStudent.setFirstName(firstName);
-                                // Print updated student details after each successful update.
-                                System.out.println("\nUpdated student details:");
-                                System.out.println(updateStudent);
-                                System.out.println("Returning to the update menu.");
-                                isUpdated = true; // Mark as updated
+                                if (firstName != null) { // Check for valid first name input.
+                                    updateStudent.setFirstName(firstName);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. First name was not updated.");
+                                }
                                 break;
                             case 3:
                                 String lastName = UserInput.lastNameInput(scanner, "Last name: "); // Updates last name.
-                                updateStudent.setLastName(lastName);
-                                // Print updated student details after each successful update.
-                                System.out.println("\nUpdated student details:");
-                                System.out.println(updateStudent);
-                                System.out.println("Returning to the update menu.");
-                                isUpdated = true; // Mark as updated
+                                if (lastName != null) { // Check for valid last name input.
+                                    updateStudent.setLastName(lastName);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. Last name was not updated.");
+                                }
                                 break;
                             case 4:
                                 String phoneNumber = UserInput.phoneNumberInput(scanner, "Phone number: "); // Updates phone number.
-                                updateStudent.setPhoneNumber(phoneNumber);
-                                // Print updated student details after each successful update.
-                                System.out.println("\nUpdated student details:");
-                                System.out.println(updateStudent);
-                                System.out.println("Returning to the update menu.");
-                                isUpdated = true; // Mark as updated
+                                if (phoneNumber != null) { // Check for valid phone number input.
+                                    updateStudent.setPhoneNumber(phoneNumber);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. Phone number was not updated.");
+                                }
                                 break;
                             case 5:
                                 String email = UserInput.emailInput(scanner, "Email: "); // Updates email.
-                                updateStudent.setEmail(email);
-                                isUpdated = true; // Mark as updated
+                                if (email != null) { // Check for valid email input.
+                                    updateStudent.setEmail(email);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. Email was not updated.");
+                                }
                                 break;
                             case 6:
                                 double gpa = UserInput.gpaInput(scanner); // Updates GPA.
-                                updateStudent.setGpa(gpa);
-                                // Print updated student details after each successful update.
-                                System.out.println("\nUpdated student details:");
-                                System.out.println(updateStudent);
-                                System.out.println("Returning to the update menu.");
-                                isUpdated = true; // Mark as updated
+                                if (gpa != -1) { // Check for valid GPA input.
+                                    updateStudent.setGpa(gpa);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. GPA was not updated.");
+                                }
                                 break;
                             case 7:
-                                boolean isContacted = UserInput.userConfirmation(scanner, "Has this student been contacted? (y/n): "); // Updates contacted status.
-                                updateStudent.setContacted(isContacted);
-                                // Print updated student details after each successful update.
-                                System.out.println("\nUpdated student details:");
-                                System.out.println(updateStudent);
-                                System.out.println("Returning to the update menu.");
-                                isUpdated = true; // Mark as updated
+                                Boolean isContacted = UserInput.userConfirmation(scanner, "Has this student been contacted? (y/n): "); // Updates contacted status.
+                                if (isContacted != null) { // Check for valid contacted status input.
+                                    updateStudent.setContacted(isContacted);
+                                    System.out.println("\nUpdated student details:");
+                                    System.out.println(updateStudent);
+                                    System.out.println("Returning to the update menu.");
+                                    isUpdated = true; // Mark as updated.
+                                } else {
+                                    System.out.println("Invalid input. Contacted status was not updated.");
+                                }
                                 break;
                             case 8:
                                 System.out.println("\nReturning to the main menu.");
@@ -165,6 +190,8 @@ public class StudentManagement {
                                 System.out.println("Invalid input. Please select a valid option.");
                                 break;
                         }
+
+
                     } while (userChoice != 8);
                 } else {
                     System.out.println("\nReturning to the main menu.");
@@ -173,7 +200,7 @@ public class StudentManagement {
                 System.out.println("Invalid input. Please enter the correct data type.");
                 scanner.nextLine(); // Clear the buffer
             } catch (Exception e) {
-                System.out.println("An unexpected error occurred: " + e.getMessage());
+                System.out.println("Invalid input. Press enter to exit the update menu.");
                 scanner.nextLine(); // Clear the buffer
             }
 
@@ -196,7 +223,7 @@ public class StudentManagement {
             System.out.println("\nNo students found.\n"); // Inform user if no students are present.
             return false; // Return false if no students are found.
         } else {
-            students.sort(Comparator.comparing(Student::getId));
+            students.sort(Comparator.comparing(Student::getLastName));
             System.out.println("\nList of students:");
             for (Student student : students) {
                 System.out.println("\nID: S" + student.getId() +

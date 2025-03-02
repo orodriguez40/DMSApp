@@ -37,7 +37,7 @@ public class Admin {
 
         // Authenticate user before accessing the menu.
         while (!authenticator.authenticate(scanner)) {
-            System.out.println("Invalid username or password. Please try again.");
+            System.out.println("Invalid username or password.");
         }
 
         // Main menu will iterate until the user chooses to close the application.
@@ -53,28 +53,35 @@ public class Admin {
                     case 1:
                         Student newStudent = UserInput.getStudentInfo(scanner); // Collects student information.
                         boolean studentAdded = studentManagement.addStudentManual(newStudent); // Checks if a student was added correctly.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + studentAdded);
                         break;
                     case 2:
                         String filepath = UserInput.getFileInfo(scanner); // Collects the file path for upload.
                         boolean fileProcessed = studentManagement.addStudentFile(filepath, scanner); // Checks if file was read correctly then the if user chooses to upload students.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + fileProcessed);
                         break;
                     case 3:
                         Student removeStudent = UserInput.searchStudentByID(scanner); // Collects student ID for removal.
                         boolean studentRemoved = studentManagement.removeStudent(removeStudent); // Checks if student was removed sucessfully.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + studentRemoved);
                         break;
                     case 4:
                         Student updateStudent = UserInput.searchStudentByID(scanner); // Collects student ID for update.
                         boolean updatedStudent = studentManagement.updateStudent(updateStudent); // Checks if student information was updated sucessfully.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + updatedStudent);
                         break;
                     case 5:
                         Student viewStudent = UserInput.searchStudentByID(scanner); // Collects studetn ID to view student details.
                         boolean viewedStudent = studentManagement.viewStudent(viewStudent); // Checks if student was found and displayed.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + viewedStudent);
                         break;
                     case 6:
                         boolean viewedStudents = studentManagement.viewAllStudents(); // Checks if student(s) were found and displayed.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + viewedStudents);
                         break;
                     case 7:
                         boolean notContactedList = studentManagement.notContacted(); // Cheks if all students who are not contacted are displayed and their GPA calculated.
+                        System.out.println("Operation result(true = successfull/ false = unsuccessfull): " + notContactedList);
                         break;
                     case 8:
                         System.out.println("Thank you for using the Success University's DMS application. Goodbye!\n"); // Message when user chooses to close application.
