@@ -56,7 +56,7 @@ public class Admin {
                         break;
                     case 2:
                         String filepath = UserInput.getFileInfo(scanner); // Collects the file path for upload.
-                        boolean fileUploaded = studentManagement.addStudentFile(filepath, scanner); // Checks if file was uploaded successfully.
+                        boolean fileProcessed = studentManagement.addStudentFile(filepath, scanner); // Checks if file was read correctly then the if user chooses to upload students.
                         break;
                     case 3:
                         Student removeStudent = UserInput.searchStudentByID(scanner); // Collects student ID for removal.

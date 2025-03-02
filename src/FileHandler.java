@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class FileHandler {
 
     // Method is called to read and process file.
+    // Method is called to read and process file.
     public boolean addStudentsByFile(String filePath, List<Student> students, Scanner scanner) {
         // BufferedReader will attempt to read the file.
         try (BufferedReader readFile = new BufferedReader(new FileReader(filePath))) {
@@ -50,7 +51,7 @@ public class FileHandler {
                         continue;
                     }
 
-                    // Checks IDs for duplicates.
+                    // Checks IDs for duplicates within the file only.
                     idCountMap.put(id, idCountMap.getOrDefault(id, 0) + 1);
 
                     // Checks first name (1-15 characters)
@@ -69,7 +70,7 @@ public class FileHandler {
 
                     // Checks phone number format (xxx) xxx-xxxx
                     String phoneNumber = details[3].trim();
-                    if (!phoneNumber.matches("\\(\\d{3}\\)\\s?\\d{3}-\\d{4}") || !phoneNumber.matches("\\(\\d{3}\\)\\d{3}-\\d{4}")) {
+                    if (!phoneNumber.matches("\\(\\d{3}\\)\\s?\\d{3}-\\d{4}") && !phoneNumber.matches("\\(\\d{3}\\)\\d{3}-\\d{4}")) {
                         invalidPhoneNumbers.add(row);
                         continue;
                     }
@@ -81,7 +82,7 @@ public class FileHandler {
                         continue;
                     }
 
-                    // Checks for duplicate emails.
+                    // Checks for duplicate emails within the file only.
                     emailCountMap.put(email, emailCountMap.getOrDefault(email, 0) + 1);
 
                     // Checks GPA (0.0 - 1.9).
@@ -97,7 +98,7 @@ public class FileHandler {
                         continue;
                     }
 
-                    // checks contacted status (true/false only).
+                    // Checks contacted status (true/false only).
                     String contactedValue = details[6].trim();
                     if (!contactedValue.equalsIgnoreCase("true") && !contactedValue.equalsIgnoreCase("false")) {
                         invalidContacted.add(row);
@@ -123,7 +124,7 @@ public class FileHandler {
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toSet());
 
-            // Checks duplicates against DMS students.
+            // Checks duplicates against existing students.
             Set<Integer> existingStudentIDs = students.stream()
                     .map(Student::getId)
                     .collect(Collectors.toSet());
@@ -153,20 +154,22 @@ public class FileHandler {
                 if (UserInput.userConfirmation(scanner, "Are you sure you want to add these students? (y/n): ")) {
                     students.addAll(validStudents);
                     System.out.println("\nStudents added successfully!");
+                    return true;
                 } else {
                     System.out.println("\nNo students were added.");
+                    return false;
                 }
             }
 
             // Display duplicate IDs.
             if (!allDuplicateIDs.isEmpty()) {
-                System.out.println("\nDuplicate IDs found (rows containing these values are skipped):\n");
+                System.out.println("\nDuplicate IDs found (rows containing these values are skipped):");
                 allDuplicateIDs.forEach(System.out::println);
             }
 
             // Display duplicate emails.
             if (!allDuplicateEmails.isEmpty()) {
-                System.out.println("\nDuplicate emails found (rows containing these values are skipped):\n");
+                System.out.println("\nDuplicate emails found (rows containing these values are skipped):");
                 allDuplicateEmails.forEach(System.out::println);
             }
 
@@ -178,7 +181,7 @@ public class FileHandler {
                 System.out.println("\nInvalid entries detected and skipped:");
 
                 if (!invalidIDs.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid IDs (must be exactly 8 digits and start with a 1):");
+                    System.out.println("\nThe following entries have invalid IDs (must be exactly 8 digits):");
                     invalidIDs.forEach(rows -> System.out.println("Invalid ID: " + rows));
                 }
 
@@ -193,7 +196,7 @@ public class FileHandler {
                 }
 
                 if (!invalidPhoneNumbers.isEmpty()) {
-                    System.out.println("\nThe following entries have invalid phone numbers(must follow (xxx)xxx-xxxx format):");
+                    System.out.println("\nThe following entries have invalid phone numbers (must follow (xxx) xxx-xxxx format):");
                     invalidPhoneNumbers.forEach(rows -> System.out.println("Invalid Phone Number: " + rows));
                 }
 
@@ -218,13 +221,13 @@ public class FileHandler {
                 }
             }
 
-            System.out.println("\nFile processing complete. Returning to the main menu.");
+            System.out.println("\nFile processing complete.");
 
         } catch (IOException e) {
             System.out.println("\nError reading the file. Please check the file path and try again.");
         } catch (Exception e) {
             System.out.println("\nAn unexpected error occurred: " + e.getMessage());
         }
-        return true; // Modify to indicate completion without early exit.
+        return false; // Modify to indicate completion without early exit.
     }
 }

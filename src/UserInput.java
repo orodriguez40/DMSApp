@@ -217,21 +217,33 @@ public class UserInput {
             }
         }
     }
+
+    // Method to collect the file path from the user for the text file containing student information.
     public static String getFileInfo(Scanner scanner) {
         String filePath;
         while (true) {
-            System.out.print("\nEnter the file path for the student list:\n");
-            System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n ");
+            System.out.print("\nEnter the file path for the student list (or type 'exit' to return to the main menu):\n");
+            System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n");
+
             filePath = scanner.nextLine().trim(); // Return file path as a string.
 
-            // Validate the file path
+            // Check that user enters exit.
+            if (filePath.equalsIgnoreCase("exit")) {
+                System.out.println("\nFile uplaod cancelled.");
+                return null; // Return null to indicate cancellation without any message.
+            }
+
+            // Validate the file path.
             if (isValidFilePath(filePath)) {
-                return filePath; // Return valid file path
+                return filePath; // Return valid file path.
             } else {
                 System.out.println("Invalid file path. Please check and try again.");
             }
         }
     }
+
+
+
 
     // Method to validate the file path
     private static boolean isValidFilePath(String filePath) {
@@ -272,7 +284,8 @@ public class UserInput {
                         return foundStudent; // Return the found student.
                     } else {
                         // No student found with the given ID.
-                        System.out.println("No student found with the given ID.");
+                        System.out.println("\nNo student found with the given ID.");
+                        return null; // Exits to the main menu.
                     }
                 } else {
                     // Invalid ID. It must be exactly 8 digits.
@@ -280,7 +293,7 @@ public class UserInput {
                 }
             } catch (NumberFormatException e) {
                 // Invalid input. Please enter a valid 8-digit number.
-                System.out.println("Invalid input. Please enter a valid 8-digit number.");
+                System.out.println("Invalid input. Please enter a valid 8-digit number.xclude the 'S' in the ID.");
             } catch (NoSuchElementException | IllegalStateException e) {
                 // Unexpected input issue. Please try again.
                 System.out.println("Unexpected input issue. Please try again.");
@@ -323,7 +336,7 @@ public class UserInput {
 
     //Method is called to confirm if user wants to update student information.
     public static boolean confirmUpdate(Scanner scanner) {
-        return userConfirmation(scanner, " \nAre you sure you want to update this student? y or n: " );
+        return userConfirmation(scanner, " \nAre you sure you want to update this student? y or n:\n" );
     }
 
     // Method is called to confirm is the user wants to enter a new input(try again or enter new information).
