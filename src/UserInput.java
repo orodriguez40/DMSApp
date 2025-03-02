@@ -5,6 +5,7 @@
 // UserInput Class:
 // This class handles all user inputs and confirmations.
 
+import java.io.File;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -12,11 +13,11 @@ import java.util.Scanner;
 
 public class UserInput {
 
-    // Method checks for user's choice in the main menu.
-    public int usersChoice(Scanner scanner) {
+    // Method checks for user's choice in the main menu and the update menu.
+    public static int usersChoice(Scanner scanner) {
         while (true) {
             try {
-                System.out.print("Enter your choice (1-8): ");
+                System.out.print("\nEnter your choice (1-8): ");
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Clears the buffer.
                 if (choice >= 1 && choice <= 8) {
@@ -36,8 +37,8 @@ public class UserInput {
         }
     }
 
-    //Method is called to collect student information and call the appropiate methods.
-    public Student getStudentInfo(Scanner scanner) {
+    //Method is called to collect student information and calls the appropiate methods.
+    public static Student getStudentInfo(Scanner scanner) {
 
         // Loop to allow adding multiple Students.
         do {
@@ -80,7 +81,7 @@ public class UserInput {
                 scanner.nextLine(); // Clear the buffer
             }
 
-            // Ask if the user wants to add another Student
+            // Ask if the user wants to add another Student.
         } while (UserInput.userConfirmation(scanner, "\nWould you like to add another student? y or n:\n"));
         System.out.println("\nReturning to the main menu.");
         return null;
@@ -114,7 +115,8 @@ public class UserInput {
         }
     }
 
-    private static String getValidatedString(Scanner scanner, String prompt, int maxLength) {
+    // Method is called to verify first and last name inputs from the user.
+    public static String validateString(Scanner scanner, String prompt, int maxLength) {
         while (true) {
             try {
                 System.out.print(prompt);
@@ -134,14 +136,16 @@ public class UserInput {
         }
     }
 
+    // Methods are called to verify string length for first and last names.
     public static String firstNameInput(Scanner scanner, String prompt) {
-        return getValidatedString(scanner, prompt, 15);
+        return validateString(scanner, prompt, 15);
     }
 
     public static String lastNameInput(Scanner scanner, String prompt) {
-        return getValidatedString(scanner, prompt, 25);
+        return validateString(scanner, prompt, 25);
     }
 
+    // Method is called to enter and verify phone number format entered by the user.
     public static String phoneNumberInput(Scanner scanner, String prompt) {
         while (true) {
             try {
@@ -162,6 +166,7 @@ public class UserInput {
         }
     }
 
+    // Method is called to check for unique and correctly formated email entered by the user.
     public static String emailInput(Scanner scanner, String prompt) {
         while (true) {
             try {
@@ -186,6 +191,7 @@ public class UserInput {
         }
     }
 
+    // Method is called to check for a valid GPA entered by the user.
     public static double gpaInput(Scanner scanner) {
         while (true) {
             try {
@@ -211,44 +217,83 @@ public class UserInput {
             }
         }
     }
+    public static String getFileInfo(Scanner scanner) {
+        String filePath;
+        while (true) {
+            System.out.print("\nEnter the file path for the student list:\n");
+            System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n ");
+            filePath = scanner.nextLine().trim(); // Return file path as a string.
 
-    // Methoc is called to collect the file path for the text file with student information.
-    public String getFileInfo(Scanner scanner) {
-        System.out.print("\nEnter the file path for the student list:\n");
-        System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n ");
-        return scanner.nextLine().trim(); // Return file path as a string.
+            // Validate the file path
+            if (isValidFilePath(filePath)) {
+                return filePath; // Return valid file path
+            } else {
+                System.out.println("Invalid file path. Please check and try again.");
+            }
+        }
     }
 
-    public static int studentIdSearch(Scanner scanner) {
+    // Method to validate the file path
+    private static boolean isValidFilePath(String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            File file = new File(filePath);
+            return file.exists() && file.isFile(); // Check if the file exists and is a file.
+        }
+        return false; // Invalid file path.
+    }
+
+    // Method searches for a student based on their ID, displays the information, and returns the student.
+    public static Student searchStudentByID(Scanner scanner) {
         while (true) {
             try {
                 System.out.print("Enter student ID: ");
                 String input = scanner.nextLine().trim();
                 int id = Integer.parseInt(input);
+
+                // Check if ID is exactly 8 digits.
                 if (id >= 10000000 && id <= 99999999) {
-                    return id;
+                    // Find the Student by ID.
+                    Student foundStudent = StudentManagement.students.stream()
+                            .filter(student -> student.getId() == id)
+                            .findFirst()
+                            .orElse(null); // Return null if no student is found
+
+                    // If student is found, display their information.
+                    if (foundStudent != null) {
+                        // Student information will be displayed.
+                        System.out.print("\nStudent Details:\n");
+                        System.out.println("\nID: S" + foundStudent.getId() +
+                                "\nName: " + foundStudent.getFirstName() + " " + foundStudent.getLastName() +
+                                "\nPhone Number: " + foundStudent.getPhoneNumber() +
+                                "\nEmail: " + foundStudent.getEmail() +
+                                "\nGPA: " + foundStudent.getGpa() +
+                                "\nContacted: " + foundStudent.getIsContacted());
+
+                        return foundStudent; // Return the found student.
+                    } else {
+                        // No student found with the given ID.
+                        System.out.println("No student found with the given ID.");
+                    }
                 } else {
+                    // Invalid ID. It must be exactly 8 digits.
                     System.out.println("Invalid ID. It must be exactly 8 digits.");
                 }
             } catch (NumberFormatException e) {
+                // Invalid input. Please enter a valid 8-digit number.
                 System.out.println("Invalid input. Please enter a valid 8-digit number.");
             } catch (NoSuchElementException | IllegalStateException e) {
+                // Unexpected input issue. Please try again.
                 System.out.println("Unexpected input issue. Please try again.");
-                scanner = new Scanner(System.in);
+                scanner = new Scanner(System.in); // Reinitialize scanner to avoid issues
             } catch (Exception e) {
+                // Unexpected error occurred. Please try again.
                 System.out.println("Unexpected error occurred. Please try again.");
-                scanner = new Scanner(System.in);
+                scanner = new Scanner(System.in); // Reinitialize scanner to avoid issues
             }
         }
     }
 
-    public static Student findStudentById(int id) {
-        return StudentManagement.students.stream()
-                .filter(student -> student.getId() == id)
-                .findFirst()
-                .orElse(null);
-    }
-
+    // Method is called to confirm user's choice when performing CRUD operations or the Custom Action.
     public static boolean userConfirmation(Scanner scanner, String message) {
         while (true) {
             try {
@@ -270,4 +315,20 @@ public class UserInput {
             }
         }
     }
+
+    // Method is called to confirm deletion of a student.
+    public static boolean confirmDeletion(Scanner scanner) {
+        return userConfirmation(scanner, "\nAre you sure you want to delete this student? y or n: ");
+    }
+
+    //Method is called to confirm if user wants to update student information.
+    public static boolean confirmUpdate(Scanner scanner) {
+        return userConfirmation(scanner, " \nAre you sure you want to update this student? y or n: " );
+    }
+
+    // Method is called to confirm is the user wants to enter a new input(try again or enter new information).
+    public static boolean newInput(Scanner scanner) {
+        return userConfirmation(scanner, "Would you like to enter a new input? y or n\n(Entering n will take you back to the main menu): ");
+    }
+
 }

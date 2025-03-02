@@ -23,7 +23,7 @@ public class Admin {
         // Attributes are instances of the Authenticator, StudentManagement, and UserInput classes.
         Authenticator authenticator = new Authenticator();
         StudentManagement studentManagement = new StudentManagement();
-        UserInput userInput = new UserInput();
+
 
         // Create an instance of Admin to access non-static methods.
         Admin admin = new Admin();
@@ -46,33 +46,35 @@ public class Admin {
             admin.viewMenu();
             // Calls method to verify user input.
             try {
-                System.out.println("\nEnter choice:");
-                userChoice = userInput.usersChoice(scanner);
+                userChoice = UserInput.usersChoice(scanner);
 
                 // Switch statement to handle user choices.
                 switch (userChoice) {
                     case 1:
-                        Student newStudent = userInput.getStudentInfo(scanner); // Collects student information.
+                        Student newStudent = UserInput.getStudentInfo(scanner); // Collects student information.
                         boolean studentAdded = studentManagement.addStudentManual(newStudent); // Checks if a student was added correctly.
                         break;
                     case 2:
-                        String filepath = userInput.getFileInfo(scanner); // Collects the file path for upload.
+                        String filepath = UserInput.getFileInfo(scanner); // Collects the file path for upload.
                         boolean fileUploaded = studentManagement.addStudentFile(filepath, scanner); // Checks if file was uploaded successfully.
                         break;
                     case 3:
-                        studentManagement.removeStudent(scanner); // Removes a student.
+                        Student removeStudent = UserInput.searchStudentByID(scanner); // Collects student ID for removal.
+                        boolean studentRemoved = studentManagement.removeStudent(removeStudent); // Checks if student was removed sucessfully.
                         break;
                     case 4:
-                        studentManagement.updateStudent(scanner); // Updates any student information.
+                        Student updateStudent = UserInput.searchStudentByID(scanner); // Collects student ID for update.
+                        boolean updatedStudent = studentManagement.updateStudent(updateStudent); // Checks if student information was updated sucessfully.
                         break;
                     case 5:
-                        studentManagement.viewStudent(scanner); // View specified student.
+                        Student viewStudent = UserInput.searchStudentByID(scanner); // Collects studetn ID to view student details.
+                        boolean viewedStudent = studentManagement.viewStudent(viewStudent); // Checks if student was found and displayed.
                         break;
                     case 6:
-                        studentManagement.viewAllStudents(); // View all students.
+                        boolean viewedStudents = studentManagement.viewAllStudents(); // Checks if student(s) were found and displayed.
                         break;
                     case 7:
-                        studentManagement.notContacted(); // View all students who have not been contacted and calculates their GPA.
+                        boolean notContactedList = studentManagement.notContacted(); // Cheks if all students who are not contacted are displayed and their GPA calculated.
                         break;
                     case 8:
                         System.out.println("Thank you for using the Success University's DMS application. Goodbye!\n"); // Message when user chooses to close application.
@@ -83,10 +85,10 @@ public class Admin {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine(); // Clear the invalid input
+                scanner.nextLine(); // Clear the invalid input.
             } catch (IllegalStateException | NoSuchElementException e) {
-                System.out.println("Input error detected (e.g., accidental Ctrl+C). Please try again.");
-                scanner = new Scanner(System.in); // Reinitialize scanner to prevent closure issues
+                System.out.println("Input error detected. Please try again.");
+                scanner = new Scanner(System.in); // Reinitialize scanner to prevent closure issues.
             } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
             }

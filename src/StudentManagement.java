@@ -6,7 +6,6 @@
 // This class manages all CRUD functions related to Students.
 
 // Imported Library
-import java.io.File;
 import java.util.*;
 
 public class StudentManagement {
@@ -14,11 +13,13 @@ public class StudentManagement {
     // Attribute to store all Students in an ArrayList.
     static final List<Student> students = new ArrayList<>();
 
+    Scanner scanner = new Scanner(System.in);
+
     // Method is called to add a Student manually.
-    public boolean addStudentManual(Student student) {
-            if (student != null) {
-                students.add(student);
-                System.out.println("Student added successfully!");
+    public boolean addStudentManual(Student newStudent) {
+            if (newStudent != null) {
+                students.add(newStudent);
+                System.out.println("\nStudent added successfully!");
                 return true; // Successfully added student.
             } else {
                 System.out.println("Student not added.");
@@ -32,7 +33,7 @@ public class StudentManagement {
             FileHandler fileHandler = new FileHandler();
             boolean result = fileHandler.addStudentsByFile(filePath, students, scanner); // Checks if file was processed successfully.
             if (result) {
-                System.out.println("File upload and student addition successful!");
+                System.out.println("\nFile upload and student addition successful!");
                 return true; // File processed successfully.
             } else {
                 System.out.println("File processing encountered errors. Check log for details.");
@@ -45,26 +46,14 @@ public class StudentManagement {
     }
 
     // Method is called to remove a student.
-    public boolean removeStudent(Scanner scanner) {
+    public boolean removeStudent(Student removeStudent) {
         while (true) {
             try {
-                int id = UserInput.studentIdSearch(scanner); // Calls helper method for the ID of the student to remove.
-                Student student = UserInput.findStudentById(id); // Calls helper method to find the student by ID.
-
-                // Checks if the student exists.
-                if (student != null) {
-                    // Student information will be displayed before confirming.
-                    System.out.print("\nStudent Found:\n");
-                    System.out.println("\nID: S" + student.getId() +
-                            "\nName: " + student.getFirstName() + " " + student.getLastName() +
-                            "\nPhone Number: " + student.getPhoneNumber() +
-                            "\nEmail: " + student.getEmail() +
-                            "\nGPA: " + student.getGpa() +
-                            "\nContacted: " + student.getIsContacted());
-
-                    // Ask for confirmation before deletion.
-                    if (UserInput.userConfirmation(scanner, "\nAre you sure you want to delete this student? y or n: ")) {
-                        students.remove(student); // Remove the student from the ArrayList.
+                // Check if the student exists before proceeding with deletion.
+                if (removeStudent != null) {
+                    // Ask for confirmation before deletion using the new method.
+                    if (UserInput.confirmDeletion(scanner)) {
+                        students.remove(removeStudent); // Remove the student from the ArrayList.
                         System.out.println("\nStudent removed successfully. Returning to the main menu.");
                         return true; // Return success after removal
                     } else {
@@ -74,43 +63,28 @@ public class StudentManagement {
                 } else {
                     System.out.println("Student not found in the system.\n"); // Inform user ID is not in the system.
 
-                    // Ask if the user wants to try again.
-                    if (!UserInput.userConfirmation(scanner, "Would you like to try again? y or n\n(Entering n will take you back to the main menu): ")) {
-                        return false; // Exit the method if user chooses not to try and return false
+                    // Ask if the user wants to enter a new input.
+                    if (!UserInput.newInput(scanner)) {
+                        return false; // Exit the method if user chooses not to try and return false.
                     }
                 }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a valid student ID.");
-                scanner.nextLine(); // Clear the invalid input
-            } catch (NoSuchElementException | IllegalStateException e) {
-                System.out.println("Input interrupted. Please try again.");
-                scanner.nextLine(); // Clear the invalid input
             } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
-                scanner.nextLine(); // Clear the buffer
             }
         }
     }
 
-    public boolean updateStudent(Scanner scanner) {
-        UserInput userInput = new UserInput();
+    // Method is called ot update student information.
+    public boolean updateStudent(Student updateStudent) {
+        // Attribute to store user's choice for the update menu.
         int userChoice;
-        boolean result = false;
+
+        // A variable to track if any updates were made.
+        boolean isUpdated = false;
 
         try {
-            int studentId = UserInput.studentIdSearch(scanner);
-            Student student = UserInput.findStudentById(studentId);
-            if (student == null) {
-                System.out.println("\nStudent not found.");
-                return false; // Return false if student is not found
-            }
-
-            // Display current student details
-            System.out.println("\nCurrent student details:");
-            System.out.println(student);
-
-            // Ask for confirmation to update
-            if (UserInput.userConfirmation(scanner, "Do you want to update this student's information? (y/n):\n")) {
+            // Ask for confirmation to update.
+            if (UserInput.confirmUpdate(scanner)) {
                 do {
                     // Display the update options.
                     System.out.println("\nUpdate Menu");
@@ -125,73 +99,58 @@ public class StudentManagement {
                     System.out.println("8: Return to the Main Menu");
 
                     // Calls method to verify user input.
-                    System.out.println("\nEnter choice:");
-                    userChoice = userInput.usersChoice(scanner);
+                    userChoice = UserInput.usersChoice(scanner);
 
                     // Switch statement to handle user choices.
                     switch (userChoice) {
                         case 1:
                             int id = UserInput.manualIdInput(scanner); // Updates student's ID.
-                            student.setId(id);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setId(id);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 2:
                             String firstName = UserInput.firstNameInput(scanner, "First name: "); // Updates first name.
-                            student.setFirstName(firstName);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setFirstName(firstName);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 3:
                             String lastName = UserInput.lastNameInput(scanner, "Last name: "); // Updates last name.
-                            student.setLastName(lastName);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setLastName(lastName);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 4:
                             String phoneNumber = UserInput.phoneNumberInput(scanner, "Phone number: "); // Updates phone number.
-                            student.setPhoneNumber(phoneNumber);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setPhoneNumber(phoneNumber);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 5:
                             String email = UserInput.emailInput(scanner, "Email: "); // Updates email.
-                            student.setEmail(email);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setEmail(email);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 6:
                             double gpa = UserInput.gpaInput(scanner); // Updates GPA.
-                            student.setGpa(gpa);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setGpa(gpa);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 7:
                             boolean isContacted = UserInput.userConfirmation(scanner, "Has this student been contacted? (y/n): "); // Updates contacted status.
-                            student.setContacted(isContacted);
-                            System.out.println("\nUpdated student details:");
-                            System.out.println(student);
-                            System.out.println("Returning to the update menu.");
-                            result = true;
+                            updateStudent.setContacted(isContacted);
+                            isUpdated = true; // Mark as updated
                             break;
                         case 8:
-                            return result; // Return to the main menu if user selects option 8
+                            System.out.println("\nReturning to the main menu.");
+                            return false; // Return to the main menu if user selects option 8
                         default:
                             System.out.println("Invalid input. Please select a valid option.");
-                            break;
+                            continue; // Continue to the next iteration of the loop
                     }
+
+                    // Print updated student details after each successful update.
+                    System.out.println("\nUpdated student details:");
+                    System.out.println(updateStudent);
+                    System.out.println("Returning to the update menu.");
+
                 } while (true);
             }
         } catch (InputMismatchException e) {
@@ -201,44 +160,25 @@ public class StudentManagement {
             System.out.println("An unexpected error occurred: " + e.getMessage());
             scanner.nextLine(); // Clear the buffer
         }
-        return result;
+
+        return isUpdated; // Return true if any updates were made, false otherwise
     }
+
 
     // Method to display specified student.
-    public boolean viewStudent(Scanner scanner) {
-        try {
-            int studentId = UserInput.studentIdSearch(scanner);
-            Student student = UserInput.findStudentById(studentId);
-
-            if (student == null) {
-                System.out.println("\nStudent not found.");
+    public boolean viewStudent(Student viewStudent) {
+            if (viewStudent == null) {
                 return false; // Return false if student is not found.
             } else {
-                System.out.println("\nStudent details:");
-                System.out.println(student);
-                System.out.println("Returning to the main menu.");
-                return true;
+                return true; // Return true if student is found.
             }
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a valid student ID.");
-            scanner.nextLine(); // Clear the invalid input
-        } catch (NoSuchElementException | IllegalStateException e) {
-            System.out.println("Input interrupted. Please try again.");
-            scanner.nextLine(); // Clear the buffer
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-            scanner.nextLine(); // Clear the buffer
         }
-
-        return false; // Return false if an error occurs or if the method exits without success
-    }
-
 
     // Method is called to view all students.
     public boolean viewAllStudents() {
         if (students.isEmpty()) {
             System.out.println("\nNo students found.\n"); // Inform user if no students are present.
-            return false; // Return false if no students are found
+            return false; // Return false if no students are found.
         } else {
             students.sort(Comparator.comparing(Student::getId));
             System.out.println("\nList of students:");
