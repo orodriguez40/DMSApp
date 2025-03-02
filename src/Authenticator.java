@@ -1,6 +1,11 @@
+// Otoniel Rodriguez-Perez
+// CEN-3024C-24204
+// 03/02/2025
+
 // Authenticator Class:
 // This class handles the authentication process to be able to use the DMS.
 
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Authenticator {
@@ -34,8 +39,12 @@ public class Authenticator {
                 }
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
+            } catch (NoSuchElementException | IllegalStateException e) {
+                System.out.println("Unexpected input issue detected. Please try again.");
+                scanner = new Scanner(System.in); // Reinitialize scanner in case of input issues.
             } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
+                scanner = new Scanner(System.in); // Reinitialize scanner for retry.
             }
         }
     }

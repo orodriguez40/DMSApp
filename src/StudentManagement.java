@@ -1,11 +1,12 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 02/23/2025
+// 03/02/2025
 
 // StudentManagement Class:
 // This class manages all CRUD functions related to Students.
 
 // Imported Library
+import java.io.File;
 import java.util.*;
 
 public class StudentManagement {
@@ -14,67 +15,33 @@ public class StudentManagement {
     static final List<Student> students = new ArrayList<>();
 
     // Method is called to add a Student manually.
-    public boolean addStudentManual(Scanner scanner) {
-        boolean result = false; // Attribute to store and return boolean.
-
-        // Loop to allow adding multiple Students.
-        do {
-            try {
-                System.out.println("Please enter the following Student information:\n");
-
-                // Get Student information through the user's input.
-                int id = UserInput.manualIdInput(scanner); // Get a unique ID for the Student.
-                String firstName = UserInput.firstNameInput(scanner, "First Name: "); // Get Student's first name.
-                String lastName = UserInput.lastNameInput(scanner, "Last Name: "); // Get Student's last name.
-                String phoneNumber = UserInput.phoneNumberInput(scanner, "Phone Number (Format (555) 555-5555): "); // Get Student's phone number.
-                String email = UserInput.emailInput(scanner, "Email (Format example@gmail.com): "); // Get Student's email address.
-                double gpa = UserInput.gpaInput(scanner); // Get the Student's GPA.
-                boolean isContacted = UserInput.userConfirmation(scanner, "Has the student been contacted? y or n: "); //
-
-                // Student information will be displayed before confirming.
-                System.out.print("\nPlease verify information is correct:\n");
-                System.out.println("\nID: S" + id +
-                        "\nName: " + firstName + " " + lastName +
-                        "\nPhone Number: " + phoneNumber +
-                        "\nEmail: " + email +
-                        "\nGPA: " + gpa +
-                        "\nContacted: " + isContacted);
-
-                // Asks user to confirm if they want to add Student.
-                if (UserInput.userConfirmation(scanner, "\nAre you sure you want to add this Student? y or n: ")) {
-                    // Add the new Student to the Students ArrayList.
-                    students.add(new Student(id, firstName, lastName, phoneNumber, email, gpa, isContacted));
-                    result = true; // Mark that a student was added
-                    System.out.println("\nResult: " + result);
-                    System.out.println("Student added successfully!");
-                } else {
-                    result = false;
-                    System.out.println("\nResult: " + result);
-                    System.out.println("Student not added.");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter the correct data type.");
-                scanner.nextLine(); // Clear the invalid input
-            } catch (Exception e) {
-                System.out.println("An unexpected error occurred: " + e.getMessage());
-                scanner.nextLine(); // Clear the buffer
+    public boolean addStudentManual(Student student) {
+            if (student != null) {
+                students.add(student);
+                System.out.println("Student added successfully!");
+                return true; // Successfully added student.
+            } else {
+                System.out.println("Student not added.");
+                return false; // Student not added.
             }
-
-            // Ask if the user wants to add another Student
-        } while (UserInput.userConfirmation(scanner, "\nWould you like to add another student? y or n:\n"));
-
-        System.out.println("\nReturning to the main menu.");
-        return result;
     }
 
     // Method is called to add students by file upload.
-    public boolean addStudentFile(Scanner scanner) {
-        System.out.print("\nEnter the file path for the student list:\n");
-        System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n ");
-        String filePath = scanner.nextLine().trim();
-
-        FileHandler fileUpload = new FileHandler();
-        return fileUpload.addStudentsByFile(filePath, students, scanner); // Add students from the file and return success/failure
+    public boolean addStudentFile(String filePath, Scanner scanner) {
+        if (filePath != null && !filePath.isEmpty()) {
+            FileHandler fileHandler = new FileHandler();
+            boolean result = fileHandler.addStudentsByFile(filePath, students, scanner); // Checks if file was processed successfully.
+            if (result) {
+                System.out.println("File upload and student addition successful!");
+                return true; // File processed successfully.
+            } else {
+                System.out.println("File processing encountered errors. Check log for details.");
+                return false; // Errors occurred during processing.
+            }
+        } else {
+            System.out.println("Invalid file path. Please check and try again.");
+            return false; // File path was invalid.
+        }
     }
 
     // Method is called to remove a student.
@@ -114,6 +81,9 @@ public class StudentManagement {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a valid student ID.");
+                scanner.nextLine(); // Clear the invalid input
+            } catch (NoSuchElementException | IllegalStateException e) {
+                System.out.println("Input interrupted. Please try again.");
                 scanner.nextLine(); // Clear the invalid input
             } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
@@ -217,20 +187,16 @@ public class StudentManagement {
                             result = true;
                             break;
                         case 8:
-                            System.out.println("Returning to the main menu."); // User chooses to go back to the main menu.
-                            break;
+                            return result; // Return to the main menu if user selects option 8
                         default:
-                            System.out.println("Invalid option. Please enter a number from 1 to 8.");// Checks for invalid user input.
+                            System.out.println("Invalid input. Please select a valid option.");
                             break;
                     }
-                } while (userChoice != 8);
-            } else {
-                System.out.println("Returning to the main menu.");
-                result = false;
+                } while (true);
             }
         } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a valid student ID.");
-            scanner.nextLine(); // Clear the invalid input
+            System.out.println("Invalid input. Please enter the correct data type.");
+            scanner.nextLine(); // Clear the buffer
         } catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
             scanner.nextLine(); // Clear the buffer
@@ -243,6 +209,7 @@ public class StudentManagement {
         try {
             int studentId = UserInput.studentIdSearch(scanner);
             Student student = UserInput.findStudentById(studentId);
+
             if (student == null) {
                 System.out.println("\nStudent not found.");
                 return false; // Return false if student is not found.
@@ -255,13 +222,17 @@ public class StudentManagement {
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a valid student ID.");
             scanner.nextLine(); // Clear the invalid input
-            return false;
+        } catch (NoSuchElementException | IllegalStateException e) {
+            System.out.println("Input interrupted. Please try again.");
+            scanner.nextLine(); // Clear the buffer
         } catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
             scanner.nextLine(); // Clear the buffer
-            return false;
         }
+
+        return false; // Return false if an error occurs or if the method exits without success
     }
+
 
     // Method is called to view all students.
     public boolean viewAllStudents() {

@@ -1,6 +1,6 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 02/23/2025
+// 03/02/2025
 
 // UserInput Class:
 // This class handles all user inputs and confirmations.
@@ -29,8 +29,61 @@ public class UserInput {
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Error: Unexpected input issue. Please try again.");
                 scanner = new Scanner(System.in); // Reinitialize scanner to allow retry.
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
+                scanner = new Scanner(System.in); // Reinitialize scanner to allow retry.
             }
         }
+    }
+
+    //Method is called to collect student information and call the appropiate methods.
+    public Student getStudentInfo(Scanner scanner) {
+
+        // Loop to allow adding multiple Students.
+        do {
+            try {
+                System.out.println("Please enter the following Student information:\n");
+
+                // Get Student information through the user's input.
+                int id = manualIdInput(scanner); // Get a unique ID for the Student.
+                String firstName = firstNameInput(scanner, "First Name: "); // Get Student's first name.
+                String lastName = lastNameInput(scanner, "Last Name: "); // Get Student's last name.
+                String phoneNumber = phoneNumberInput(scanner, "Phone Number (Format (555) 555-5555): "); // Get Student's phone number.
+                String email = emailInput(scanner, "Email (Format example@gmail.com): "); // Get Student's email address.
+                double gpa = gpaInput(scanner); // Get the Student's GPA.
+                boolean isContacted = userConfirmation(scanner, "Has the student been contacted? y or n: "); //
+
+                // Student information will be displayed before confirming.
+                System.out.print("\nPlease verify information is correct:\n");
+                System.out.println("\nID: S" + id +
+                        "\nName: " + firstName + " " + lastName +
+                        "\nPhone Number: " + phoneNumber +
+                        "\nEmail: " + email +
+                        "\nGPA: " + gpa +
+                        "\nContacted: " + isContacted);
+
+                // Asks user to confirm if they want to add Student.
+                if (UserInput.userConfirmation(scanner, "\nAre you sure you want to add this Student? y or n: ")) {
+                    // Add the new Student to the Students ArrayList.
+                    return new Student(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
+                } else {
+                    return null;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter the correct data type.");
+                scanner.nextLine(); // Clear the invalid input
+            } catch (NoSuchElementException | IllegalStateException e) {
+                System.out.println("Input interrupted. Please try again.");
+                scanner.nextLine(); // Clear the invalid input
+            } catch (Exception e) {
+                System.out.println("An unexpected error occurred: " + e.getMessage());
+                scanner.nextLine(); // Clear the buffer
+            }
+
+            // Ask if the user wants to add another Student
+        } while (UserInput.userConfirmation(scanner, "\nWould you like to add another student? y or n:\n"));
+        System.out.println("\nReturning to the main menu.");
+        return null;
     }
 
     // Method to get a patron ID from user input.
@@ -54,6 +107,9 @@ public class UserInput {
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Input issue detected. Please try again.");
                 scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
+                scanner = new Scanner(System.in);
             }
         }
     }
@@ -70,6 +126,9 @@ public class UserInput {
                 }
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Unexpected input issue. Please try again.");
+                scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
         }
@@ -96,6 +155,9 @@ public class UserInput {
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Unexpected input issue. Please try again.");
                 scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
+                scanner = new Scanner(System.in);
             }
         }
     }
@@ -116,6 +178,9 @@ public class UserInput {
                 }
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Unexpected input issue. Please try again.");
+                scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
         }
@@ -140,8 +205,18 @@ public class UserInput {
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Unexpected input issue. Please try again.");
                 scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
+                scanner = new Scanner(System.in);
             }
         }
+    }
+
+    // Methoc is called to collect the file path for the text file with student information.
+    public String getFileInfo(Scanner scanner) {
+        System.out.print("\nEnter the file path for the student list:\n");
+        System.out.print("Example (C:\\Users\\<YourUsername>\\Desktop\\<YourFileName>.txt)\n ");
+        return scanner.nextLine().trim(); // Return file path as a string.
     }
 
     public static int studentIdSearch(Scanner scanner) {
@@ -159,6 +234,9 @@ public class UserInput {
                 System.out.println("Invalid input. Please enter a valid 8-digit number.");
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Unexpected input issue. Please try again.");
+                scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
         }
@@ -185,6 +263,9 @@ public class UserInput {
                 }
             } catch (NoSuchElementException | IllegalStateException e) {
                 System.out.println("Unexpected input issue. Please try again.");
+                scanner = new Scanner(System.in);
+            } catch (Exception e) {
+                System.out.println("Unexpected error occurred. Please try again.");
                 scanner = new Scanner(System.in);
             }
         }

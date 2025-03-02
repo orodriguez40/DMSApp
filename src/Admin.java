@@ -1,3 +1,7 @@
+// Otoniel Rodriguez-Perez
+// CEN-3024C-24204
+// 03/02/2025
+
 // Admin Class (Main Application):
 // This is where the DMS application will run.
 // The user will open the JAR file through the CLI.
@@ -8,6 +12,7 @@
 
 // Imported Library
 import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Admin {
@@ -47,10 +52,12 @@ public class Admin {
                 // Switch statement to handle user choices.
                 switch (userChoice) {
                     case 1:
-                        studentManagement.addStudentManual(scanner); // Adds a student manually.
+                        Student newStudent = userInput.getStudentInfo(scanner); // Collects student information.
+                        boolean studentAdded = studentManagement.addStudentManual(newStudent); // Checks if a student was added correctly.
                         break;
                     case 2:
-                        studentManagement.addStudentFile(scanner); // Add student(s) by file upload.
+                        String filepath = userInput.getFileInfo(scanner); // Collects the file path for upload.
+                        boolean fileUploaded = studentManagement.addStudentFile(filepath, scanner); // Checks if file was uploaded successfully.
                         break;
                     case 3:
                         studentManagement.removeStudent(scanner); // Removes a student.
@@ -77,6 +84,9 @@ public class Admin {
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter a number.");
                 scanner.nextLine(); // Clear the invalid input
+            } catch (IllegalStateException | NoSuchElementException e) {
+                System.out.println("Input error detected (e.g., accidental Ctrl+C). Please try again.");
+                scanner = new Scanner(System.in); // Reinitialize scanner to prevent closure issues
             } catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
             }
