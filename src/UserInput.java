@@ -16,23 +16,29 @@ public class UserInput {
     // Method checks for user's choice in the main menu and the update menu.
     public static int usersChoice(Scanner scanner) {
         while (true) {
+            int choice = 0;
             try {
-                System.out.print("\nEnter your choice (1-8): ");
-                int choice = scanner.nextInt();
-                scanner.nextLine(); // Clears the buffer.
-                if (choice >= 1 && choice <= 8) {
-                    return choice; // Return valid input.
+                System.out.print("\nEnter your choice (1-8):");
+                if (scanner.hasNextInt()) { // Check if the next token is an integer
+                    choice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the newline character
+                    if (choice >= 1 && choice <= 8) {
+                        return choice; // Return valid input.
+                    }
+                    System.out.println("Invalid choice. Please select a number between 1 and 8.");
+                } else {
+                    System.out.println("Invalid input. Please enter a number.");
+                    scanner.nextLine(); // Clear the invalid input
                 }
-                System.out.println("Invalid choice. Please select a number between 1 and 8.");
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine(); // Clears invalid input.
-            } catch (NoSuchElementException | IllegalStateException e) {
-                System.out.println("Error: Unexpected input issue. Please try again.");
-                scanner = new Scanner(System.in); // Reinitialize scanner to allow retry.
+            } catch (NoSuchElementException e) {
+                System.out.println("Error: Unexpected input issue.");
+                System.out.println(choice);
+
+            } catch (IllegalStateException e) {
+                System.out.println("Error: Scanner is closed.");
+
             } catch (Exception e) {
-                System.out.println("Unexpected error occurred. Please try again.");
-                scanner = new Scanner(System.in); // Reinitialize scanner to allow retry.
+                System.out.println("Unexpected error occurred.");
             }
         }
     }
@@ -337,16 +343,14 @@ public class UserInput {
                     System.out.println("Invalid ID. It must be exactly 8 digits.");
                 }
             } catch (NumberFormatException e) {
-                // Invalid input. Please enter a valid 8-digit number.
                 System.out.println("Invalid input. Please enter a valid 8-digit number (exclude the 'S' in the ID).");
             } catch (NoSuchElementException | IllegalStateException e) {
-                // Unexpected input issue. Please try again.
                 System.out.println("Unexpected input issue. Please try again.");
-                scanner = new Scanner(System.in); // Reinitialize scanner to avoid issues
+                scanner = new Scanner(System.in);
             } catch (Exception e) {
-                // Unexpected error occurred. Please try again.
+
                 System.out.println("Unexpected error occurred. Please try again.");
-                scanner = new Scanner(System.in); // Reinitialize scanner to avoid issues
+                scanner = new Scanner(System.in);
             }
             attempts++;
         }
@@ -361,7 +365,7 @@ public class UserInput {
         while (attempts < 3) {
             try {
                 System.out.print(message);
-                String choice = scanner.nextLine().trim().toLowerCase();
+                String choice = scanner.nextLine().trim().toLowerCase(); // Read the entire line and trim whitespace.
                 if (choice.equals("y") || choice.equals("yes")) {
                     return true;
                 } else if (choice.equals("n") || choice.equals("no")) {
@@ -369,12 +373,12 @@ public class UserInput {
                 } else {
                     System.out.println("Invalid input. Enter 'y' for yes or 'n' for no.");
                 }
-            } catch (NoSuchElementException | IllegalStateException e) {
+            } catch (NoSuchElementException e) {
                 System.out.println("Unexpected input issue. Please try again.");
-                scanner = new Scanner(System.in);
+            } catch (IllegalStateException e) {
+                System.out.println("Scanner is closed. Please try again.");
             } catch (Exception e) {
                 System.out.println("Unexpected error occurred. Please try again.");
-                scanner = new Scanner(System.in);
             }
             attempts++;
         }
