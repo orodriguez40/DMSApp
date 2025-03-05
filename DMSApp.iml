@@ -23,5 +23,10 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="JavaFx 17 bin" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:17.0.14" level="project" />
+    <orderEntry type="library" name="bin" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:win:17.0.14" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:17.0.14" level="project" />
   </component>
 </module>
