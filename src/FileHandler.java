@@ -257,32 +257,6 @@ public class FileHandler {
         showScrollableWindow("Duplicate Emails", message.toString());
     }
 
-    /**
-     * Displays a scrollable window with the provided title and content.
-     * A "Continue" button is added so that the user may exit the window.
-     */
-    private static void showScrollableWindow(String title, String content) {
-        Stage window = new Stage();
-        window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle(title);
-
-        TextArea textArea = new TextArea(content);
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setPrefSize(400, 300);
-
-        Button continueButton = new Button("Continue");
-        continueButton.setOnAction(e -> window.close());
-
-        VBox layout = new VBox(10);
-        layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(textArea, continueButton);
-
-        Scene scene = new Scene(layout);
-        window.setScene(scene);
-        window.showAndWait();
-    }
-
 
     private static void showValidStudentsWindowWithConfirmation(String content, boolean[] confirmedHolder) {
         Stage validStage = new Stage();
@@ -330,8 +304,32 @@ public class FileHandler {
         validStage.showAndWait();
     }
 
+    private static void showScrollableWindow(String title, String content) {
+        Stage window = new Stage();
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle(title);
+
+        TextArea textArea = new TextArea(content);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefSize(400, 300);
+
+        Button continueButton = new Button("Continue");
+        continueButton.setOnAction(e -> window.close());
+
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);
+        layout.getChildren().addAll(textArea, continueButton);
+
+        Scene scene = new Scene(layout);
+        window.setScene(scene);
+        window.showAndWait();
+    }
+
+
+
     // Utility method to show a simple alert with a title and message.
-    private static void showAlert(String title, String message) {
+    public static void showAlert(String title, String message) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);

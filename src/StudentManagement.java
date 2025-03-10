@@ -3,17 +3,13 @@
 // 03/02/2025
 
 // StudentManagement Class:
-// This class manages all CRUD functions related to Students.
+// This class manages all CRUD functions and the custom action.
 
-// Imported Library
-
-import javafx.application.Application;
+// Imported Libraries
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -83,7 +79,7 @@ public class StudentManagement {
                 String firstName = firstNameField.getText();
                 firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
 
-                if(firstName.matches(".*\\d.*") || !firstName.matches("[a-zA-Z]+")){
+                if (firstName.matches(".*\\d.*") || !firstName.matches("[a-zA-Z]+")) {
                     throw new IllegalArgumentException("Invalid First Name: Must contain only letters.");
                 }
 
@@ -93,14 +89,14 @@ public class StudentManagement {
 
                 firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
 
-                if(firstName.matches(".*\\d.*") || !firstName.matches("[a-zA-Z]+")){
+                if (firstName.matches(".*\\d.*") || !firstName.matches("[a-zA-Z]+")) {
                     throw new IllegalArgumentException("Invalid First Name: Must contain only letters.");
                 }
 
                 String lastName = lastNameField.getText();
                 lastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase();
 
-                if(lastName.matches(".*\\d.*") || !lastName.matches("[a-zA-Z]+")){
+                if (lastName.matches(".*\\d.*") || !lastName.matches("[a-zA-Z]+")) {
                     throw new IllegalArgumentException("Invalid Last Name: Must contain only letters.");
                 }
 
@@ -209,7 +205,6 @@ public class StudentManagement {
         popupStage.setScene(scene);
         popupStage.showAndWait();
     }
-
 
 
     // Method is called to add students by file upload.
@@ -352,7 +347,7 @@ public class StudentManagement {
                     showAlert("Cancellation", "Deletion canceled.\n");
                 }
             } else {
-                showAlert("Invalid Input","Please enter a valid ID to delete student.\n");
+                showAlert("Invalid Input", "Please enter a valid ID to delete student.\n");
             }
         });
 
@@ -552,15 +547,15 @@ public class StudentManagement {
                 });
 
 
-                clearButtonUpdate.setOnAction(c ->{
-                        idFieldUpdate.clear();
-                        firstNameFieldUpdate.clear();
-                        lastNameFieldUpdate.clear();
-                        phoneFieldUpdate.clear();
-                        emailFieldUpdate.clear();
-                        gpaFieldUpdate.clear();
-                        contactedFieldUpdate.clear();
-                        });
+                clearButtonUpdate.setOnAction(c -> {
+                    idFieldUpdate.clear();
+                    firstNameFieldUpdate.clear();
+                    lastNameFieldUpdate.clear();
+                    phoneFieldUpdate.clear();
+                    emailFieldUpdate.clear();
+                    gpaFieldUpdate.clear();
+                    contactedFieldUpdate.clear();
+                });
 
                 // Layout setup
                 GridPane grid = new GridPane();
@@ -610,17 +605,174 @@ public class StudentManagement {
         grid.add(clearButton, 2, 1);
 
         // Scene setup
-        Scene scene = new Scene(grid, 300, 150);
+        Scene scene = new Scene(grid, 300, 100);
         popupStage.setScene(scene);
         popupStage.showAndWait();
     }
 
+    public static void viewOneStudent() {
+        // Create a new Stage for the popup
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Student Search");
 
-    private static void showAlert(String title, String message) {
+        // Create label and text field for student ID input
+        Label idLabel = new Label("Student ID:");
+        TextField idField = new TextField();
+
+        // Buttons for search and clear
+        Button searchButton = new Button("Search");
+        Button clearButton = new Button("Clear");
+
+        //If student is found, it is pass as an Atomic Reference to search.
+        AtomicReference<Student> foundStudentRef = new AtomicReference<>();
+
+        // Action for the Search button
+        searchButton.setOnAction(e -> {
+            String studentId = idField.getText().trim();
+            if (!studentId.isEmpty()) {
+
+                Student findStudent = UserInput.searchStudentByID(studentId);
+                foundStudentRef.set(findStudent); // Store it in AtomicReference
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                if (findStudent != null) {
+                    alert.setTitle("Student found");
+                    alert.setHeaderText(null);
+                    alert.setContentText(findStudent.toString());
+                    alert.showAndWait();
+                }
+
+            } else {
+                showAlert("Error", "Please enter a student ID to search.");
+            }
+        });
+
+
+        // Action for the Clear button
+        clearButton.setOnAction(e -> idField.clear());
+
+        // Layout for the popup
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setVgap(8);
+        grid.setHgap(10);
+        grid.add(idLabel, 0, 0);
+        grid.add(idField, 1, 0);
+        grid.add(searchButton, 0, 1);
+        grid.add(clearButton, 2, 1);
+
+        // Scene for the popup
+        Scene scene = new Scene(grid, 300, 100);
+        popupStage.setScene(scene);
+        popupStage.showAndWait(); // Show the popup and wait for it to close
+    }
+
+    // Method is called to view all students.
+    public static void viewAllStudents() {
+        if (students.isEmpty()) {
+            showAlert("Error", "No students found in the DMS"); // Inform user if no students are present.
+            return;
+        }
+
+        students.sort(Comparator.comparing(Student::getLastName));
+
+        // Create a new Stage (window)
+        Stage studentStage = new Stage();
+        studentStage.setTitle("DMS Students");
+
+        // Create a scrollable TextArea
+        TextArea studentTextArea = new TextArea();
+        studentTextArea.setText(students.toString());
+        studentTextArea.setEditable(false); // Make it read-only
+        studentTextArea.setWrapText(true);
+        studentTextArea.setPrefSize(400, 300);
+
+        // Wrap TextArea in a ScrollPane
+        ScrollPane scrollPane = new ScrollPane(studentTextArea);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        // Create a 'Continue' button that closes the window
+        Button continueButton = new Button("Continue");
+        continueButton.setOnAction(e -> studentStage.close());
+
+        // Layout
+        VBox layout = new VBox(10, scrollPane, continueButton);
+        layout.setAlignment(Pos.CENTER);
+        layout.setPrefSize(400, 300); // Set window size
+
+        // Set the scene
+        Scene scene = new Scene(layout);
+        studentStage.setScene(scene);
+        studentStage.show();
+    }
+
+    public static void notContacted() {
+        // Target GPA
+        double targetGPA = 2.0;
+
+        // Filter students who have not been contacted
+        List<Student> notContactedStudents = students.stream()
+                .filter(student -> !student.getIsContacted())
+                .sorted(Comparator.comparing(Student::getLastName)) // Sort while streaming
+                .toList(); // Collect into a mutable list
+
+
+        // Check if no students who have not been contacted.
+        if (notContactedStudents.isEmpty()) {
+            showAlert("Error", "There are no available students to display");
+            return;
+        }
+
+        // Create a new window (Stage)
+        Stage stage = new Stage();
+        stage.setTitle("Not Contacted Students");
+
+        // VBox to hold student details
+        VBox vbox = new VBox(10);
+        vbox.setStyle("-fx-padding: 10;");
+
+        // Add each student to the VBox with GPA improvement
+        for (Student student : notContactedStudents) {
+            Label studentLabel = new Label(student.toString());
+
+            // Calculate GPA improvement needed
+            double gpaImprovement = targetGPA - student.getGpa();
+            Label gpaLabel = new Label("GPA improvement needed: " + String.format("%.2f", gpaImprovement));
+
+            // Add student details and GPA improvement to VBox
+            vbox.getChildren().addAll(studentLabel, gpaLabel, new Separator());
+        }
+
+        // Create a ScrollPane to contain the VBox
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+
+        // Continue Button
+        Button continueButton = new Button("Continue");
+        continueButton.setOnAction(e -> stage.close());
+
+        // VBox to hold everything (student list + button)
+        VBox mainLayout = new VBox(10, scrollPane, continueButton);
+        mainLayout.setAlignment(Pos.CENTER);
+        mainLayout.setStyle("-fx-padding: 10;");
+
+        // Create a Scene and set it in the Stage
+        Scene scene = new Scene(mainLayout, 400, 350);
+        stage.setScene(scene);
+
+        // Show the new window
+        stage.show();
+    }
+
+
+
+static void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
-    }
+}

@@ -50,6 +50,7 @@ public class UserInput {
             return null;
         }
     }
+
     private static void handleException(Exception e) {
         if (e instanceof InputMismatchException) {
             System.out.println("Invalid input. Please enter the correct data type.");
@@ -67,6 +68,7 @@ public class UserInput {
         );
 
     }
+
     public static boolean firstNameInput(String firstName) {
         return handleValidation(() -> firstName != null && !firstName.isEmpty() && firstName.length() <= 15 && !firstName.matches(".*\\d.*") && firstName.matches("[a-zA-Z]+"));
     }
@@ -123,7 +125,7 @@ public class UserInput {
                     return foundStudent; // Return the found student.
                 } else {
                     // No student found with the given ID.
-                    showAlert("Error","\nNo student found with the given ID.");
+                    showAlert("Error", "\nNo student found with the given ID.");
                     return null; // Exits to the main menu.
                 }
             } else {
@@ -131,18 +133,18 @@ public class UserInput {
                 showAlert("Invalid ID", "It must be exactly 8 digits.");
             }
         } catch (NumberFormatException e) {
-            showAlert("Invalid input","Please enter a valid 8-digit number (exclude the 'S' in the ID).");
+            showAlert("Invalid input", "Please enter a valid 8-digit number (exclude the 'S' in the ID).");
         } catch (NoSuchElementException | IllegalStateException e) {
             showAlert("Unexpected input issue", "Please try again.");
         } catch (Exception e) {
-            showAlert("Unexpected error occurred","Please try again.");
+            showAlert("Unexpected error occurred", "Please try again.");
         }
 
         return null; // Indicate failure
-}
+    }
 
     // Utility method to show a simple alert with a title and message.
-    private static void showAlert(String title, String message) {
+    public static void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
