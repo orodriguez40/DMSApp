@@ -84,7 +84,7 @@ public class Student {
         this.gpa = gpa;
     }
 
-    public void setContacted(boolean contacted) {
+    public void setIsContacted(boolean contacted) {
         isContacted = contacted;
     }
 

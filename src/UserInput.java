@@ -80,7 +80,7 @@ public class UserInput {
     }
 
     public static boolean emailInput(String email) {
-        return handleValidation(() -> email.matches("^[A-Za-z][A-Za-z0-9._-]*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$") &&
+        return handleValidation(() -> email.matches("^[A-Za-z][A-Za-z0-9._-]*(?<![._-])@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$") &&
                 StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), email)));
     }
 

@@ -352,7 +352,7 @@ public class StudentManagement {
                     showAlert("Cancellation", "Deletion canceled.\n");
                 }
             } else {
-                showAlert("Invalid Input","Please enter a valid student ID to delete.\n");
+                showAlert("Invalid Input","Please enter a valid ID to delete student.\n");
             }
         });
 
@@ -392,14 +392,13 @@ public class StudentManagement {
         Button updateButton = new Button("Update");
         Button clearButton = new Button("Clear");
 
-        //If student is found, it is pass as an Atomic Reference for deletion.
+        // If student is found, it is passed as an Atomic Reference for modification
         AtomicReference<Student> foundStudentRef = new AtomicReference<>();
 
         // Action for the Search button
         searchButton.setOnAction(e -> {
             String studentId = idField.getText().trim();
             if (!studentId.isEmpty()) {
-
                 Student findStudent = UserInput.searchStudentByID(studentId);
                 foundStudentRef.set(findStudent); // Store it in AtomicReference
 
@@ -410,7 +409,6 @@ public class StudentManagement {
                     alert.setContentText(findStudent.toString());
                     alert.showAndWait();
                 }
-
             } else {
                 showAlert("Error", "Please enter a student ID to search.");
             }
@@ -418,19 +416,189 @@ public class StudentManagement {
 
         // Action for the Update button
         updateButton.setOnAction(e -> {
-            String studentId = idField.getText().trim();
-            if (!studentId.isEmpty()) {
-                // outputArea.appendText("Updating student with ID: " + studentId + "\n");
-                popupStage.close();
+            if (foundStudentRef.get() != null) {
+                // Create a new stage for the update form
+                Stage updatePopupStage = new Stage();
+                updatePopupStage.initModality(Modality.APPLICATION_MODAL);
+                updatePopupStage.setTitle("Update Student Details");
+
+                // Instruction label
+                Label instructionLabel = new Label("Enter new values in the fields below:");
+                instructionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #333; -fx-padding: 5px;");
+
+                // Form labels and fields
+                Label idLabelUpdate = new Label("ID:");
+                TextField idFieldUpdate = new TextField(String.valueOf(foundStudentRef.get().getId()));
+                Label firstNameLabelUpdate = new Label("First Name:");
+                TextField firstNameFieldUpdate = new TextField(foundStudentRef.get().getFirstName());
+                Label lastNameLabelUpdate = new Label("Last Name:");
+                TextField lastNameFieldUpdate = new TextField(foundStudentRef.get().getLastName());
+                Label phoneLabelUpdate = new Label("Phone Number:");
+                TextField phoneFieldUpdate = new TextField(foundStudentRef.get().getPhoneNumber());
+                Label emailLabelUpdate = new Label("Email:");
+                TextField emailFieldUpdate = new TextField(foundStudentRef.get().getEmail());
+                Label gpaLabelUpdate = new Label("GPA:");
+                TextField gpaFieldUpdate = new TextField(String.valueOf(foundStudentRef.get().getGpa()));
+                Label contactedLabelUpdate = new Label("Contacted Status:");
+                TextField contactedFieldUpdate = new TextField(String.valueOf(foundStudentRef.get().getIsContacted()));
+
+                // Buttons
+                Button updateButtonConfirm = new Button("Confirm Update");
+                Button clearButtonUpdate = new Button("Clear");
+
+                // Holds the student for update
+                Student updateStudent = foundStudentRef.get();
+
+                updateButtonConfirm.setOnAction(update -> {
+
+                    // Alerts to display to the user if student information was updated.
+                    Alert successAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    Alert failedAlert = new Alert(Alert.AlertType.ERROR);
+
+                    String idInput = idFieldUpdate.getText().trim();
+
+                    if (!idInput.isEmpty()) {
+                        try {
+                            int id = Integer.parseInt(idInput);
+                            boolean validateId = UserInput.manualIDInput(id);
+
+                            if (validateId) {
+                                updateStudent.setId(id);
+                            } else {
+                                failedAlert.setTitle("ID not updated");
+                                failedAlert.setHeaderText(null);
+                                failedAlert.setContentText("Please make sure it is a valid 8-digit ID and not a duplicate.");
+                                failedAlert.showAndWait();
+                            }
+                        } catch (NumberFormatException exception) {
+                            // Ignore invalid input gracefully
+                        }
+                    }
+
+                    String firstName = firstNameFieldUpdate.getText().trim();
+                    if (!firstName.isEmpty()) {
+                        try {
+                            String modifiedFirstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
+                            boolean validateFirstName = UserInput.firstNameInput(modifiedFirstName);
+
+                            if (validateFirstName) {
+                                updateStudent.setFirstName(modifiedFirstName);
+                            } else {
+                                failedAlert.setTitle("First name not updated");
+                                failedAlert.setHeaderText(null);
+                                failedAlert.setContentText("Please make sure it contains only letters and is less than 16 characters.");
+                                failedAlert.showAndWait();
+                            }
+                        } catch (Exception exception) {
+                            // Ignore invalid input gracefully
+                        }
+                    }
+
+                    String lastName = lastNameFieldUpdate.getText().trim();
+                    if (!lastName.isEmpty()) {
+                        try {
+                            String modifiedLastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase();
+                            boolean validateLastName = UserInput.firstNameInput(modifiedLastName);
+
+                            if (validateLastName) {
+                                updateStudent.setLastName(modifiedLastName);
+                            } else {
+                                failedAlert.setTitle("Last name not updated");
+                                failedAlert.setHeaderText(null);
+                                failedAlert.setContentText("Please make sure it contains only letters and is less than 26 characters.");
+                                failedAlert.showAndWait();
+                            }
+                        } catch (Exception exception) {
+                            // Ignore invalid input gracefully
+                        }
+                    }
+
+                    String phoneNumber = phoneFieldUpdate.getText().trim();
+                    if (!phoneNumber.isEmpty() && UserInput.phoneNumberInput(phoneNumber)) {
+                        updateStudent.setPhoneNumber(phoneNumber);
+                    }
+
+                    String email = emailFieldUpdate.getText().trim();
+                    if (!email.isEmpty() && UserInput.emailInput(email)) {
+                        updateStudent.setEmail(email.toLowerCase());
+                    }
+
+                    String gpaInput = gpaFieldUpdate.getText().trim();
+                    if (!gpaInput.isEmpty()) {
+                        try {
+                            double gpa = Double.parseDouble(gpaInput);
+                            if (UserInput.gpaInput(gpa)) {
+                                updateStudent.setGpa(gpa);
+                            }
+                        } catch (NumberFormatException exception) {
+                            // Ignore invalid input gracefully
+                        }
+                    }
+
+                    String contacted = contactedFieldUpdate.getText().trim().toLowerCase();
+                    if (!contacted.isEmpty()) {
+                        if (contacted.equalsIgnoreCase("true")) {
+                            updateStudent.setIsContacted(true);
+                        } else if (contacted.equalsIgnoreCase("false")) {
+                            updateStudent.setIsContacted(false);
+                        }
+                    }
+
+                    // Show success alert only if some fields were updated
+                    successAlert.setTitle("Current Student Details");
+                    successAlert.setHeaderText(null);
+                    successAlert.setContentText(updateStudent.toString());
+                    successAlert.showAndWait();
+                });
+
+
+                clearButtonUpdate.setOnAction(c ->{
+                        idFieldUpdate.clear();
+                        firstNameFieldUpdate.clear();
+                        lastNameFieldUpdate.clear();
+                        phoneFieldUpdate.clear();
+                        emailFieldUpdate.clear();
+                        gpaFieldUpdate.clear();
+                        contactedFieldUpdate.clear();
+                        });
+
+                // Layout setup
+                GridPane grid = new GridPane();
+                grid.setPadding(new Insets(10));
+                grid.setVgap(8);
+                grid.setHgap(10);
+
+                grid.add(instructionLabel, 0, 0, 2, 1); // Spanning two columns
+                grid.add(idLabelUpdate, 0, 1);
+                grid.add(idFieldUpdate, 1, 1);
+                grid.add(firstNameLabelUpdate, 0, 2);
+                grid.add(firstNameFieldUpdate, 1, 2);
+                grid.add(lastNameLabelUpdate, 0, 3);
+                grid.add(lastNameFieldUpdate, 1, 3);
+                grid.add(phoneLabelUpdate, 0, 4);
+                grid.add(phoneFieldUpdate, 1, 4);
+                grid.add(emailLabelUpdate, 0, 5);
+                grid.add(emailFieldUpdate, 1, 5);
+                grid.add(gpaLabelUpdate, 0, 6);
+                grid.add(gpaFieldUpdate, 1, 6);
+                grid.add(contactedLabelUpdate, 0, 7);
+                grid.add(contactedFieldUpdate, 1, 7);
+                grid.add(updateButtonConfirm, 0, 8);
+                grid.add(clearButtonUpdate, 1, 8);
+
+                // Scene setup
+                Scene updateScene = new Scene(grid, 350, 350);
+                updatePopupStage.setScene(updateScene);
+                updatePopupStage.showAndWait();
             } else {
-                // outputArea.appendText("Please enter a student ID to update.\n");
+                showAlert("Invalid Input", "Please enter a valid ID to update the student.");
             }
         });
 
         // Action for the Clear button
         clearButton.setOnAction(e -> idField.clear());
 
-        // Layout for the popup
+        // Main layout
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(10));
         grid.setVgap(8);
@@ -441,10 +609,10 @@ public class StudentManagement {
         grid.add(updateButton, 1, 1);
         grid.add(clearButton, 2, 1);
 
-        // Scene for the popup
+        // Scene setup
         Scene scene = new Scene(grid, 300, 150);
         popupStage.setScene(scene);
-        popupStage.showAndWait(); // Show the popup and wait for it to close
+        popupStage.showAndWait();
     }
 
 

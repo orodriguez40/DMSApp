@@ -151,63 +151,6 @@ public class DMSApp extends Application {
 
     }
 
-
-    private void updateStudentGUI() {
-        // Create a new Stage for the popup
-        Stage popupStage = new Stage();
-        popupStage.initModality(Modality.APPLICATION_MODAL);
-        popupStage.setTitle("Update Student");
-
-        // Create label and text field for student ID input
-        Label idLabel = new Label("Student ID:");
-        TextField idField = new TextField();
-
-        // Buttons for search, update, and clear
-        Button searchButton = new Button("Search");
-        Button updateButton = new Button("Update");
-        Button clearButton = new Button("Clear");
-
-        // Action for the Search button
-        searchButton.setOnAction(e -> {
-            String studentId = idField.getText().trim();
-            if (!studentId.isEmpty()) {
-              //  outputArea.appendText("Searching for student with ID: " + studentId + "\n");
-            } else {
-               // outputArea.appendText("Please enter a student ID to search.\n");
-            }
-        });
-
-        // Action for the Update button
-        updateButton.setOnAction(e -> {
-            String studentId = idField.getText().trim();
-            if (!studentId.isEmpty()) {
-               // outputArea.appendText("Updating student with ID: " + studentId + "\n");
-                popupStage.close();
-            } else {
-               // outputArea.appendText("Please enter a student ID to update.\n");
-            }
-        });
-
-        // Action for the Clear button
-        clearButton.setOnAction(e -> idField.clear());
-
-        // Layout for the popup
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(10));
-        grid.setVgap(8);
-        grid.setHgap(10);
-        grid.add(idLabel, 0, 0);
-        grid.add(idField, 1, 0);
-        grid.add(searchButton, 0, 1);
-        grid.add(updateButton, 1, 1);
-        grid.add(clearButton, 2, 1);
-
-        // Scene for the popup
-        Scene scene = new Scene(grid, 300, 150);
-        popupStage.setScene(scene);
-        popupStage.showAndWait(); // Show the popup and wait for it to close
-    }
-
     private void viewOneStudentGUI() {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
