@@ -18,19 +18,18 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.util.Objects;
 
 public class DMSApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         // Load university logo from file
-        File logoFile = new File("Logo/logo.png");
-        ImageView logoView = new ImageView();
-        if (logoFile.exists()) {
-            logoView.setImage(new Image(logoFile.toURI().toString()));
-            logoView.setFitWidth(150);
-            logoView.setPreserveRatio(true);
-        }
+        Image logoFile = new Image(Objects.requireNonNull(getClass().getResource("/Logo/logo.png")).toExternalForm());
+        ImageView logoView = new ImageView(logoFile);
+        logoView.setFitWidth(150);
+        logoView.setPreserveRatio(true);
+
 
         // Username input field
         Label userLabel = new Label("Username:");
