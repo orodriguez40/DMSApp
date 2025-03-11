@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class FileHandler {
 
+    // Method is called to validate file contents and upload student information from a text file.
     public static boolean addStudentsByFile(String filePath, List<Student> students) {
         // Lists to store invalid entries per category
         List<String> invalidEntries = new ArrayList<>();
@@ -121,7 +122,7 @@ public class FileHandler {
         }
 
         // Always display invalid entries (if any) using a scrollable window with a Continue button.
-        showAlertsForInvalidEntries(invalidEntries, invalidIDs, invalidFirstNames, invalidLastNames,
+        showInvalidEntries(invalidEntries, invalidIDs, invalidFirstNames, invalidLastNames,
                 invalidPhoneNumbers, invalidEmails, invalidGPA, invalidContacted);
 
         // Duplicate check within the file
@@ -175,7 +176,7 @@ public class FileHandler {
             uniqueValidStudents.forEach(student -> message.append(student.toString()).append("\n"));
             // This flag will be set by the confirmation dialog
             boolean[] confirmed = new boolean[1];
-            showValidStudentsWindowWithConfirmation(message.toString(), confirmed);
+            showValidStudents(message.toString(), confirmed);
             if (confirmed[0]) {
                 students.addAll(uniqueValidStudents);
                 showAlert("Success", "Students Added Successfully!");
@@ -192,11 +193,10 @@ public class FileHandler {
         return false;
     }
 
-    /**
-     * Displays invalid (or incorrectly formatted) entries in a scrollable window.
-     * A "Continue" button is added so that the user can click it (or exit) to continue.
-     */
-    private static void showAlertsForInvalidEntries(List<String> invalidEntries, List<String> invalidIDs,
+
+     //Displays invalid (or incorrectly formatted) entries in a scrollable window.
+     //"Continue" button is added so that the user can click it (or exit) to continue.
+    private static void showInvalidEntries(List<String> invalidEntries, List<String> invalidIDs,
                                                     List<String> invalidFirstNames, List<String> invalidLastNames,
                                                     List<String> invalidPhoneNumbers, List<String> invalidEmails,
                                                     List<String> invalidGPA, List<String> invalidContacted) {
@@ -239,26 +239,26 @@ public class FileHandler {
                         .append(String.join("\n", invalidEntries));
             }
 
-            showScrollableWindow("Invalid Entries", message.toString());
+            scrollableWindow("Invalid Entries", message.toString());
         }
     }
 
-    // Displays duplicate entries detected by ID in a scrollable window with a "Continue" button.
+    // Displays duplicate entries detected by ID.
     private static void showDuplicateIDs(List<Student> duplicateStudents) {
         StringBuilder message = new StringBuilder("Duplicate entries detected by ID:\n");
         duplicateStudents.forEach(student -> message.append(student.toString()).append("\n"));
-        showScrollableWindow("Duplicate IDs", message.toString());
+        scrollableWindow("Duplicate IDs", message.toString());
     }
 
-    // Displays duplicate entries detected by Email in a scrollable window with a "Continue" button.
+    // Displays duplicate entries detected by Email.
     private static void showDuplicateEmails(List<Student> duplicateStudents) {
         StringBuilder message = new StringBuilder("Duplicate entries detected by Email:\n");
         duplicateStudents.forEach(student -> message.append(student.toString()).append("\n"));
-        showScrollableWindow("Duplicate Emails", message.toString());
+        scrollableWindow("Duplicate Emails", message.toString());
     }
 
 
-    private static void showValidStudentsWindowWithConfirmation(String content, boolean[] confirmedHolder) {
+    private static void showValidStudents(String content, boolean[] confirmedHolder) {
         Stage validStage = new Stage();
         validStage.setTitle("Valid Students");
         validStage.initModality(Modality.APPLICATION_MODAL);
@@ -304,7 +304,8 @@ public class FileHandler {
         validStage.showAndWait();
     }
 
-    private static void showScrollableWindow(String title, String content) {
+    // Helper method to diplay list of valid and invalid students.
+    private static void scrollableWindow(String title, String content) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle(title);

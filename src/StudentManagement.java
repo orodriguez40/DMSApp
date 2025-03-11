@@ -25,11 +25,13 @@ public class StudentManagement {
     // Attribute to store all Students in an ArrayList.
     static final List<Student> students = new ArrayList<>();
 
+    // Method is called to add a student manually.
     public static void addStudentManual() {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
         popupStage.setTitle("Add Student Manually");
 
+        // Labels and Fields to help user enter data.
         Label idLabel = new Label("ID:");
         TextField idField = new TextField();
         Label firstNameLabel = new Label("First Name:");
@@ -45,11 +47,14 @@ public class StudentManagement {
         Label contactedLabel = new Label("Contacted Status:");
         TextField contactedField = new TextField();
 
+        // Buttons to perform actions.
         Button addButton = new Button("Add");
         Button clearButton = new Button("Clear");
 
+        // When addButton is clicked, user validation and confirmation is performed.
         addButton.setOnAction(e -> {
             try {
+                // All fields must contain value in order to add a student.
                 if (idField.getText().isEmpty() || firstNameField.getText().isEmpty() || lastNameField.getText().isEmpty()
                         || phoneField.getText().isEmpty() || emailField.getText().isEmpty()
                         || gpaField.getText().isEmpty() || contactedField.getText().isEmpty()) {
@@ -57,6 +62,7 @@ public class StudentManagement {
                     return;
                 }
 
+                // Validates ID
                 if (!idField.getText().matches("\\d{8}")) {
                     throw new IllegalArgumentException("Invalid ID: Must be exactly 8 digits and start with a 1.");
                 }
@@ -66,12 +72,12 @@ public class StudentManagement {
                 if (id < 10000000 || id > 99999999) {
                     throw new IllegalArgumentException("Invalid ID: Must be between 10000000 and 99999999.");
                 }
-
                 // Check if the ID is already in the system
                 if (!UserInput.manualIDInput(id)) {
                     throw new IllegalArgumentException("ID already exists in the system.");
                 }
 
+                // Validates first name and automatically converts the letters for the first to be uppercase and the rest lowercase.
                 if (firstNameField.getText().length() > 15) {
                     throw new IllegalArgumentException("Invalid First Name: Must be less than 15 characters.");
                 }
@@ -83,14 +89,9 @@ public class StudentManagement {
                     throw new IllegalArgumentException("Invalid First Name: Must contain only letters.");
                 }
 
+                // Validates last name and automatically converts the letters for the first to be uppercase and the rest lowercase.
                 if (lastNameField.getText().length() > 25) {
                     throw new IllegalArgumentException("Invalid Last Name: Must be less than 25 characters.");
-                }
-
-                firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
-
-                if (firstName.matches(".*\\d.*") || !firstName.matches("[a-zA-Z]+")) {
-                    throw new IllegalArgumentException("Invalid First Name: Must contain only letters.");
                 }
 
                 String lastName = lastNameField.getText();
@@ -100,12 +101,14 @@ public class StudentManagement {
                     throw new IllegalArgumentException("Invalid Last Name: Must contain only letters.");
                 }
 
+                // Validates phone number.
                 if (!phoneField.getText().matches("\\d{3}-\\d{3}-\\d{4}")) {
                     throw new IllegalArgumentException("Invalid Phone Number: Valid format (555-555-5555).");
                 }
 
                 String phoneNumber = phoneField.getText();
 
+                // Validates email.
                 if (!emailField.getText().matches("^[A-Za-z][A-Za-z0-9._-]*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
                     throw new IllegalArgumentException("Invalid Email: Valid format (example@example.com).");
                 }
@@ -113,12 +116,15 @@ public class StudentManagement {
                 String email = emailField.getText();
                 email = email.toLowerCase();
 
+                // Checks if the email is already in the system
                 if (!UserInput.emailInput(email)) {
-                    throw new IllegalArgumentException("Invalid Email: Email must be unique.");
+                    throw new IllegalArgumentException("Email is already in use: Email must be unique.");
                 }
 
+
+                // Validates GPA
                 if (!gpaField.getText().matches("-?\\d+(\\.\\d+)?")) {
-                    throw new IllegalArgumentException("Invalid input: Please enter a double number.");
+                    throw new IllegalArgumentException("Invalid input: Please enter a double number (example 1.0).");
                 }
 
                 double gpa = Double.parseDouble(gpaField.getText());
@@ -127,26 +133,28 @@ public class StudentManagement {
                     throw new IllegalArgumentException("Invalid GPA: Must be between 0 and 1.9.");
                 }
 
+                // Validates contacted status.
                 boolean isContacted = Boolean.parseBoolean(contactedField.getText());
 
                 if (!contactedField.getText().equalsIgnoreCase("true") && !contactedField.getText().equalsIgnoreCase("false")) {
                     throw new IllegalArgumentException("Invalid input: Please enter 'true' for yes or 'false' for no.");
                 }
 
-                // Ask for confirmation before adding student
+                // Ask for confirmation before adding student.
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation");
                 confirmationAlert.setHeaderText("Add Student");
                 confirmationAlert.setContentText("Are you sure you want to add this student?");
 
-                // Show the alert and wait for user response
+                // Show the alert and wait for user response.
                 Optional<ButtonType> result = confirmationAlert.showAndWait();
 
                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                    // If user clicked 'Yes' (OK), add the student
+                    // If user clicked 'Yes' (OK), add the student.
                     Student newStudent = UserInput.getStudentInfo(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
 
                     if (newStudent != null) {
+                        // Student is added and displayed to the user.
                         students.add(newStudent);
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Student Added!");
@@ -154,6 +162,7 @@ public class StudentManagement {
                         alert.setContentText(newStudent.toString());
                         alert.showAndWait();
 
+                        // Fields are cleared for new entry.
                         idField.clear();
                         firstNameField.clear();
                         lastNameField.clear();
@@ -170,6 +179,7 @@ public class StudentManagement {
             }
         });
 
+        // Clears fields
         clearButton.setOnAction(e -> {
             idField.clear();
             firstNameField.clear();
@@ -221,8 +231,9 @@ public class StudentManagement {
 
         // File chooser button
         Button chooseFileButton = new Button("Choose File");
-        StringBuilder fileContent = new StringBuilder();
 
+        // when button is clicked, file chooser window will appear for the user to select file.
+        // The user can also type or copy/paste the file path.
         chooseFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Student File");
@@ -230,17 +241,7 @@ public class StudentManagement {
             File selectedFile = fileChooser.showOpenDialog(popupStage);
             if (selectedFile != null) {
                 filePathField.setText(selectedFile.getAbsolutePath());
-                fileContent.setLength(0); // Clear previous content
 
-                // Read the file content
-                try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        fileContent.append(line).append("\n");
-                    }
-                } catch (IOException ex) {
-                    showAlert("File Error", "Error reading the file. Please check the file format.");
-                }
             }
         });
 
@@ -262,6 +263,7 @@ public class StudentManagement {
             }
         });
 
+        // Clears field
         clearButton.setOnAction(e -> filePathField.clear());
 
         // Layout for the popup
@@ -271,7 +273,7 @@ public class StudentManagement {
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 
-        // Add all components in a visually pleasing order
+        // Add all components displayed in order
         layout.getChildren().addAll(filePathLabel, filePathField, chooseFileButton, uploadButton, clearButton);
         Scene scene = new Scene(layout, 350, 250);
         popupStage.setScene(scene);
@@ -279,6 +281,7 @@ public class StudentManagement {
 
     }
 
+    // Method is called to delete student from DMS.
     public static void removeStudent() {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
@@ -372,6 +375,7 @@ public class StudentManagement {
     }
 
 
+    // Method is called to update student information.
     public static void updateStudent() {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
@@ -462,11 +466,11 @@ public class StudentManagement {
                             } else {
                                 failedAlert.setTitle("ID not updated");
                                 failedAlert.setHeaderText(null);
-                                failedAlert.setContentText("Please make sure it is a valid 8-digit ID and not a duplicate.");
+                                failedAlert.setContentText("Please make sure it is a valid 8-digit ID and not the same ID or a duplicate.");
                                 failedAlert.showAndWait();
                             }
                         } catch (NumberFormatException exception) {
-                            // Ignore invalid input gracefully
+                            // Ignore invalid input
                         }
                     }
 
@@ -485,7 +489,7 @@ public class StudentManagement {
                                 failedAlert.showAndWait();
                             }
                         } catch (Exception exception) {
-                            // Ignore invalid input gracefully
+                            // Ignore invalid input
                         }
                     }
 
@@ -504,19 +508,43 @@ public class StudentManagement {
                                 failedAlert.showAndWait();
                             }
                         } catch (Exception exception) {
-                            // Ignore invalid input gracefully
+                            // Ignore empty field
                         }
                     }
 
-                    String phoneNumber = phoneFieldUpdate.getText().trim();
-                    if (!phoneNumber.isEmpty() && UserInput.phoneNumberInput(phoneNumber)) {
-                        updateStudent.setPhoneNumber(phoneNumber);
+
+                        String phoneNumber = phoneFieldUpdate.getText().trim();
+                        if (!phoneNumber.isEmpty()) {
+                            try {
+                            if (UserInput.phoneNumberInput(phoneNumber)) {
+                                updateStudent.setPhoneNumber(phoneNumber);
+                            } else {
+                                failedAlert.setTitle("Phone number was not update");
+                                failedAlert.setHeaderText(null);
+                                failedAlert.setContentText("Please make sure it is a valid 10-digit number in the format (###-###-####)");
+                                failedAlert.showAndWait();
+                            }
+                        } catch(Exception exception){
+                                // Ignore empty field
+                        }
                     }
 
                     String email = emailFieldUpdate.getText().trim();
-                    if (!email.isEmpty() && UserInput.emailInput(email)) {
-                        updateStudent.setEmail(email.toLowerCase());
-                    }
+                        if(!email.isEmpty()) {
+                            try {
+                                if (UserInput.emailInput(email)) {
+                                    updateStudent.setEmail(email.toLowerCase());
+                                } else {
+                                    failedAlert.setTitle("Email was not updated");
+                                    failedAlert.setHeaderText(null);
+                                    failedAlert.setContentText("Please make sure it is a different, unique email and in the format (example@example.com).");
+                                    failedAlert.showAndWait();
+                                }
+                            } catch (Exception exception) {
+                                // Ignore empty field
+                            }
+                        }
+
 
                     String gpaInput = gpaFieldUpdate.getText().trim();
                     if (!gpaInput.isEmpty()) {
@@ -524,19 +552,33 @@ public class StudentManagement {
                             double gpa = Double.parseDouble(gpaInput);
                             if (UserInput.gpaInput(gpa)) {
                                 updateStudent.setGpa(gpa);
+                            } else {
+                                failedAlert.setTitle("GPA was not updated");
+                                failedAlert.setHeaderText(null);
+                                failedAlert.setContentText("Please make sure it a double number between 0 and 1.9.");
+                                failedAlert.showAndWait();
                             }
-                        } catch (NumberFormatException exception) {
-                            // Ignore invalid input gracefully
+                        } catch (Exception exception) {
+                            // Ignore empty field
                         }
                     }
 
-                    String contacted = contactedFieldUpdate.getText().trim().toLowerCase();
-                    if (!contacted.isEmpty()) {
-                        if (contacted.equalsIgnoreCase("true")) {
-                            updateStudent.setIsContacted(true);
-                        } else if (contacted.equalsIgnoreCase("false")) {
-                            updateStudent.setIsContacted(false);
+                    try {
+                        String contacted = contactedFieldUpdate.getText().trim().toLowerCase();
+                        if (!contacted.isEmpty()) {
+                            if (contacted.equalsIgnoreCase("true")) {
+                                updateStudent.setIsContacted(true);
+                            } else if (contacted.equalsIgnoreCase("false")) {
+                                updateStudent.setIsContacted(false);
+                            } else {
+                                failedAlert.setTitle("Contacted was not updated");
+                                failedAlert.setHeaderText(null);
+                                failedAlert.setContentText("Please make sure you enter 'true' for yes or 'false' for no.");
+                                failedAlert.showAndWait();
+                            }
                         }
+                    } catch (Exception exception) {
+                        // Ignore empty field
                     }
 
                     // Show success alert only if some fields were updated
@@ -610,6 +652,7 @@ public class StudentManagement {
         popupStage.showAndWait();
     }
 
+    // Method is called to search and view one student.
     public static void viewOneStudent() {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
@@ -708,6 +751,7 @@ public class StudentManagement {
         studentStage.show();
     }
 
+    // Method is called to view students who have not been contacted and have their improvement GPA calculated.
     public static void notContacted() {
         // Target GPA
         double targetGPA = 2.0;
@@ -768,6 +812,7 @@ public class StudentManagement {
 
 
 
+    // Helper method for input validation.
 static void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

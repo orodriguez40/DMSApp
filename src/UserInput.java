@@ -13,6 +13,7 @@ import java.util.Objects;
 
 public class UserInput {
 
+    // Method is called ot validate manual user input.
     public static Student getStudentInfo(int id, String firstName, String lastName, String phoneNumber, String email, double gpa, boolean isContacted) {
         try {
             if (!(manualIDInput(id))) {
@@ -51,6 +52,7 @@ public class UserInput {
         }
     }
 
+    // Displays all exceptions made by the user.
     private static void handleException(Exception e) {
         if (e instanceof InputMismatchException) {
             System.out.println("Invalid input. Please enter the correct data type.");
@@ -61,6 +63,7 @@ public class UserInput {
         }
     }
 
+    // Validates ID format and uniqueness.
     public static boolean manualIDInput(int id) {
         return handleValidation(() ->
                 id >= 10000000 && id <= 99999999 &&
@@ -69,27 +72,33 @@ public class UserInput {
 
     }
 
+    // Checks if first name has at most 15 characters and only letters.
     public static boolean firstNameInput(String firstName) {
         return handleValidation(() -> firstName != null && !firstName.isEmpty() && firstName.length() <= 15 && !firstName.matches(".*\\d.*") && firstName.matches("[a-zA-Z]+"));
     }
 
+    // Checks if last name has at most 25 characters and only letters.
     public static boolean lastNameInput(String lastName) {
         return handleValidation(() -> lastName != null && !lastName.isEmpty() && lastName.length() <= 25 && !lastName.matches(".*\\d.*") && lastName.matches("[a-zA-Z]+"));
     }
 
+    // Check if number has 10 digits and in the correct format.
     public static boolean phoneNumberInput(String phoneNumber) {
         return handleValidation(() -> phoneNumber.matches("\\d{3}-\\d{3}-\\d{4}"));
     }
 
+    // Checks for email format and uniqueness.
     public static boolean emailInput(String email) {
         return handleValidation(() -> email.matches("^[A-Za-z][A-Za-z0-9._-]*(?<![._-])@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$") &&
                 StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), email)));
     }
 
+    // Checks for valid gpa.
     public static boolean gpaInput(double gpa) {
         return handleValidation(() -> gpa >= 0 && gpa <= 1.9);
     }
 
+    // Checks for valid contacted status.
     public static Boolean isContactedConfirmation(Boolean isContacted) {
         return handleValidation(() -> isContacted != null) ? isContacted : null;
     }
