@@ -1,11 +1,11 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/12/2025
+// 03/30/2025
 
 // DMSApp Class (Main application):
-// This class handles the GUI for the user to interact with the student management system.
-// It displays options for CRUD operations and a custom action.
-// The user interacts with the UI to perform actions, and methods from other classes handle processing and validation.
+// This version eliminates the separate login screen.
+// Users now only enter database connection details which serve as the authentication.
+// If the connection is successful, the main menu (with CRUD options) is displayed.
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -17,80 +17,123 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.io.*;
 import java.util.Objects;
 
 public class DMSApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Load university logo from file
+        // Directly prompt the user for database connection details.
+        databaseConnection(primaryStage);
+    }
+
+    // Prompts the user to enter MySQL database connection details.
+    // These credentials serve as the sole authentication for using the DMS.
+    // The university logo is displayed at the top of this window.
+    private void databaseConnection(Stage primaryStage) {
+        Stage dbStage = new Stage();
+        dbStage.setTitle("Success University DMS");
+        dbStage.initOwner(primaryStage);
+        dbStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+        // Load university logo from file and configure its appearance
         Image logoFile = new Image(Objects.requireNonNull(getClass().getResource("/Logo/logo.png")).toExternalForm());
         ImageView logoView = new ImageView(logoFile);
         logoView.setFitWidth(150);
         logoView.setPreserveRatio(true);
 
+        // Create labels and input fields for database connection
+        Label serverLabel = new Label("MySQL Server Address:");
+        TextField serverField = new TextField("localhost");  // default value
 
-        // Username input field
-        Label userLabel = new Label("Username:");
-        TextField usernameField = new TextField();
+        Label dbNameLabel = new Label("Database Name:");
+        TextField dbNameField = new TextField();
 
-        // Password input field
-        Label passLabel = new Label("Password:");
-        PasswordField passwordField = new PasswordField();
+        Label dbUserLabel = new Label("Database Username:");
+        TextField dbUserField = new TextField();
 
-        // Login button
-        Button loginButton = new Button("Login");
-        loginButton.setStyle("-fx-font-size: 14px; -fx-background-color: #0077cc; -fx-text-fill: white;");
-        Label messageLabel = new Label(); // Label to show error messages if login fails
+        Label dbPassLabel = new Label("Database Password:");
+        PasswordField dbPassField = new PasswordField();
+        // Pressing Enter in the password field triggers the connect button
+        Button connectButton = new Button("Connect");
+        Label messageLabel = new Label();
 
-        // Handle login button action
-        loginButton.setOnAction(e -> {
-            String username = usernameField.getText().trim();
-            String password = passwordField.getText().trim();
+        dbPassField.setOnAction(e -> connectButton.fire());
 
-            // Authenticate user using the Authenticator class
-            if (Authenticator.authenticate(username, password)) {
-                showMainMenu(primaryStage); // Show main menu on successful login
-            } else {
-                messageLabel.setText("Invalid username or password"); // Display error message
+        connectButton.setOnAction(e -> {
+            String server = serverField.getText().trim();
+            String dbName = dbNameField.getText().trim();
+            String dbUser = dbUserField.getText().trim();
+            String dbPass = dbPassField.getText().trim();
+
+            if (server.isEmpty() || dbName.isEmpty() || dbUser.isEmpty()) {
+                messageLabel.setText("Please fill in all required fields.");
+                return;
+            }
+            try {
+                DatabaseConnector.connect(server, dbName, dbUser, dbPass);
+                // Connection successful: close DB dialog and show main menu
+                dbStage.close();
+                showMainMenu(primaryStage);
+            } catch (Exception ex) {
+                messageLabel.setText("Connection failed: " + ex.getMessage());
             }
         });
 
-        // Allow pressing Enter in password field to trigger login
-        passwordField.setOnAction(e -> loginButton.fire());
+        // Layout for input fields
+        VBox fieldsLayout = new VBox(10, serverLabel, serverField, dbNameLabel, dbNameField,
+                dbUserLabel, dbUserField, dbPassLabel, dbPassField, connectButton, messageLabel);
+        fieldsLayout.setAlignment(Pos.CENTER);
 
-        // Layout for login screen
-        VBox inputBox = new VBox(10, userLabel, usernameField, passLabel, passwordField, loginButton, messageLabel);
-        inputBox.setAlignment(Pos.CENTER);
+        // Overall layout: logo at the top and connection fields below
+        VBox layout = new VBox(20, logoView, fieldsLayout);
+        layout.setAlignment(Pos.CENTER);
+        layout.setPadding(new Insets(20));
 
-        // Main layout with login fields and logo
-        HBox mainLayout = new HBox(20, inputBox, logoView);
-        mainLayout.setAlignment(Pos.CENTER);
-        mainLayout.setPadding(new Insets(20));
-
-        // Scene and Stage setup
-        Scene scene = new Scene(mainLayout, 400, 300);
-        primaryStage.setTitle("University DMS Login");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(layout, 350, 470);
+        dbStage.setScene(scene);
+        dbStage.showAndWait();
     }
 
+    // Displays the main menu with CRUD options.
+    // Enhanced to look more polished and professional, now with a scroll bar in case content overflows.
     private void showMainMenu(Stage primaryStage) {
-        // Create layout for main menu
+        // Create a BorderPane to hold a top banner and the main content
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setPadding(new Insets(20));
+        mainLayout.setStyle("-fx-background-color: linear-gradient(to right, #4A90E2, #50C9C3);");
+
+        // Top banner with the university logo and a title
+        HBox topBanner = new HBox();
+        topBanner.setAlignment(Pos.CENTER);
+        topBanner.setSpacing(15);
+
+        // Load the same university logo for consistency
+        Image logoFile = new Image(Objects.requireNonNull(getClass().getResource("/Logo/logo.png")).toExternalForm());
+        ImageView logoView = new ImageView(logoFile);
+        logoView.setFitWidth(100);
+        logoView.setPreserveRatio(true);
+
+        Label mainMenuLabel = new Label("Success University DMS\nMain Menu");
+        mainMenuLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;");
+
+        topBanner.getChildren().addAll(logoView, mainMenuLabel);
+        mainLayout.setTop(topBanner);
+
+        // VBox for buttons
         VBox buttonLayout = new VBox(15);
         buttonLayout.setAlignment(Pos.CENTER);
-        buttonLayout.setPadding(new Insets(20));
+        buttonLayout.setPadding(new Insets(30, 20, 30, 20));
 
-        // Main menu title
-        Label mainMenuLabel = new Label("Main Menu\n Please choose from the following options:");
-        mainMenuLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center");
+        // Subtitle label (fixed CSS: using bold instead of semi-bold)
+        Label subLabel = new Label("Please choose from the following options:");
+        subLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFFFFF; -fx-font-weight: bold;");
 
-        // Buttons for CRUD operations and custom actions
+        // Create the CRUD option buttons
         Button addStudentManualButton = new Button("Add Student Manually");
         addStudentManualButton.setOnAction(e -> StudentManagement.addStudentManual());
 
-        Button addStudentFileButton = new Button("Add Student by File");
+        Button addStudentFileButton = new Button("Add Students from File");
         addStudentFileButton.setOnAction(e -> StudentManagement.addStudentFile());
 
         Button removeStudentButton = new Button("Remove Student");
@@ -108,7 +151,7 @@ public class DMSApp extends Application {
         Button notContactedButton = new Button("View Not Contacted Students");
         notContactedButton.setOnAction(e -> StudentManagement.notContacted());
 
-        // Apply styling to buttons for consistency
+        // Style the buttons for a cohesive look
         for (Button button : new Button[]{
                 addStudentManualButton, addStudentFileButton, removeStudentButton,
                 updateStudentButton, viewOneStudentButton, viewAllStudentsButton, notContactedButton
@@ -117,33 +160,36 @@ public class DMSApp extends Application {
             button.setStyle("-fx-font-size: 14px; " +
                     "-fx-background-color: #4C9ED9; " +
                     "-fx-text-fill: white; " +
-                    "-fx-border-color: white; " +   // White border outline
-                    "-fx-border-width: 2px; " +    // Border thickness
-                    "-fx-border-radius: 5px; " +   // Rounded corners
-                    "-fx-padding: 10px 20px;");    // Better button padding
+                    "-fx-border-color: white; " +
+                    "-fx-border-width: 2px; " +
+                    "-fx-border-radius: 5px; " +
+                    "-fx-padding: 10px 20px;");
         }
 
-        // Add buttons to the layout
+        // Add all items to the button layout
+        buttonLayout.getChildren().add(subLabel);
         buttonLayout.getChildren().addAll(
-                mainMenuLabel, addStudentManualButton, addStudentFileButton,
-                removeStudentButton, updateStudentButton, viewOneStudentButton,
-                viewAllStudentsButton, notContactedButton
+                addStudentManualButton, addStudentFileButton, removeStudentButton,
+                updateStudentButton, viewOneStudentButton, viewAllStudentsButton, notContactedButton
         );
 
-        // Align buttons to the center for better UI appearance
-        HBox mainContent = new HBox(30, buttonLayout);
-        mainContent.setAlignment(Pos.CENTER);
-        mainContent.setPadding(new Insets(10));
-        mainContent.setSpacing(50); // Added spacing for better appearance
+        // Wrap the button layout in a StackPane for the semi-transparent background
+        StackPane centerPane = new StackPane(buttonLayout);
+        centerPane.setStyle("-fx-background-color: rgba(255, 255, 255, 0.3); " +
+                "-fx-background-radius: 10; " +
+                "-fx-padding: 20;");
 
-        // Apply styling to the main menu layout
-        mainContent.setPadding(new Insets(20));
-        mainContent.setSpacing(15);
-        mainContent.setAlignment(Pos.CENTER);
-        mainContent.setStyle("-fx-background-color: linear-gradient(to right, #4A90E2, #50C9C3);"); // Gradient background
+        // Now add a ScrollPane so the user can scroll if needed
+        ScrollPane scrollPane = new ScrollPane(centerPane);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
-        // Scene and Stage setup with improved styling
-        Scene mainMenuScene = new Scene(mainContent, 550, 550); // Slightly larger for better spacing
+        // Put the ScrollPane in the center of the main layout
+        mainLayout.setCenter(scrollPane);
+
+        // Create and set the scene
+        Scene mainMenuScene = new Scene(mainLayout, 600, 500);
         primaryStage.setScene(mainMenuScene);
         primaryStage.setTitle("Success University DMS");
         primaryStage.show();
