@@ -133,7 +133,7 @@ public class DMSApp extends Application {
         Button addStudentManualButton = new Button("Add Student Manually");
         addStudentManualButton.setOnAction(e -> StudentManagement.addStudentManual());
 
-        Button addStudentFileButton = new Button("Add Students from File");
+        Button addStudentFileButton = new Button("Add Student(s) by File Upload");
         addStudentFileButton.setOnAction(e -> StudentManagement.addStudentFile());
 
         Button removeStudentButton = new Button("Remove Student");

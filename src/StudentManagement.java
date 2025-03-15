@@ -16,6 +16,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -151,35 +154,51 @@ public class StudentManagement {
 
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     // If user clicked 'Yes' (OK), add the student.
+                    // Adds student to the students array list to display to the user.
                     Student newStudent = UserInput.getStudentInfo(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
 
-                    if (newStudent != null) {
-                        // Student is added and displayed to the user.
+                    // Insert student into the database.
+                    String insertSQL = "INSERT INTO students (id, firstName, lastName, phoneNumber, email, gpa, isContacted) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    try (Connection conn = DatabaseConnector.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
+                        stmt.setInt(1, id);
+                        stmt.setString(2, firstName);
+                        stmt.setString(3, lastName);
+                        stmt.setString(4, phoneNumber);
+                        stmt.setString(5, email);
+                        stmt.setDouble(6, gpa);
+                        stmt.setBoolean(7, isContacted);
+                        stmt.executeUpdate();
+
+                        // Student is added to the students list.
                         students.add(newStudent);
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Student Added!");
                         alert.setHeaderText(null);
+                        assert newStudent != null;
                         alert.setContentText(newStudent.toString());
                         alert.showAndWait();
-
-                        // Fields are cleared for new entry.
-                        idField.clear();
-                        firstNameField.clear();
-                        lastNameField.clear();
-                        phoneField.clear();
-                        emailField.clear();
-                        gpaField.clear();
-                        contactedField.clear();
-                    } else {
-                        showAlert("Error", "Failed to add student. Please try again.");
+                    } catch (SQLException ex) {
+                        showAlert("Database Error", "Failed to add student: " + ex.getMessage());
                     }
+
+                    // Clear fields after successful insertion.
+                    idField.clear();
+                    firstNameField.clear();
+                    lastNameField.clear();
+                    phoneField.clear();
+                    emailField.clear();
+                    gpaField.clear();
+                    contactedField.clear();
                 }
             } catch (IllegalArgumentException ex) {
                 showAlert("Invalid Input", ex.getMessage());
             }
         });
 
-        // Clears fields
+
+
+                    // Clears fields
         clearButton.setOnAction(e -> {
             idField.clear();
             firstNameField.clear();
@@ -222,7 +241,7 @@ public class StudentManagement {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
-        popupStage.setTitle("Add Student by File");
+        popupStage.setTitle("Add Student(s) by File");
 
         // Create labels and text fields for file path
         Label filePathLabel = new Label("File Path:");
@@ -237,7 +256,7 @@ public class StudentManagement {
         chooseFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Student File");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.sql"));
             File selectedFile = fileChooser.showOpenDialog(popupStage);
             if (selectedFile != null) {
                 filePathField.setText(selectedFile.getAbsolutePath());
