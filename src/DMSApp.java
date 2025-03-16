@@ -28,15 +28,14 @@ public class DMSApp extends Application {
     }
 
     // Prompts the user to enter MySQL database connection details.
-    // These credentials serve as the sole authentication for using the DMS.
-    // The university logo is displayed at the top of this window.
+    // These credentials serve as the authentication for using the DMS.
     private void databaseConnection(Stage primaryStage) {
         Stage dbStage = new Stage();
         dbStage.setTitle("Success University DMS");
         dbStage.initOwner(primaryStage);
         dbStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-        // Load university logo from file and configure its appearance
+        // Load university logo from file
         Image logoFile = new Image(Objects.requireNonNull(getClass().getResource("/Logo/logo.png")).toExternalForm());
         ImageView logoView = new ImageView(logoFile);
         logoView.setFitWidth(150);
@@ -54,7 +53,7 @@ public class DMSApp extends Application {
 
         Label dbPassLabel = new Label("Database Password:");
         PasswordField dbPassField = new PasswordField();
-        // Pressing Enter in the password field triggers the connect button
+        // Pressing Enter in the password field triggers the connect button.
         Button connectButton = new Button("Connect");
         Label messageLabel = new Label();
 
@@ -71,7 +70,7 @@ public class DMSApp extends Application {
                 return;
             }
             try {
-                DatabaseConnector.connect(server, dbName, dbUser, dbPass);
+                DatabaseConnector.setCredentials(server, dbName, dbUser, dbPass);
                 // Connection successful: close DB dialog and show main menu
                 dbStage.close();
                 showMainMenu(primaryStage);
@@ -85,7 +84,7 @@ public class DMSApp extends Application {
                 dbUserLabel, dbUserField, dbPassLabel, dbPassField, connectButton, messageLabel);
         fieldsLayout.setAlignment(Pos.CENTER);
 
-        // Overall layout: logo at the top and connection fields below
+        // Overall layout
         VBox layout = new VBox(20, logoView, fieldsLayout);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(20));
@@ -96,7 +95,6 @@ public class DMSApp extends Application {
     }
 
     // Displays the main menu with CRUD options.
-    // Enhanced to look more polished and professional, now with a scroll bar in case content overflows.
     private void showMainMenu(Stage primaryStage) {
         // Create a BorderPane to hold a top banner and the main content
         BorderPane mainLayout = new BorderPane();
@@ -108,7 +106,7 @@ public class DMSApp extends Application {
         topBanner.setAlignment(Pos.CENTER);
         topBanner.setSpacing(15);
 
-        // Load the same university logo for consistency
+        // Load the university logo in the main menu
         Image logoFile = new Image(Objects.requireNonNull(getClass().getResource("/Logo/logo.png")).toExternalForm());
         ImageView logoView = new ImageView(logoFile);
         logoView.setFitWidth(100);
@@ -125,7 +123,7 @@ public class DMSApp extends Application {
         buttonLayout.setAlignment(Pos.CENTER);
         buttonLayout.setPadding(new Insets(30, 20, 30, 20));
 
-        // Subtitle label (fixed CSS: using bold instead of semi-bold)
+        // Subtitle label
         Label subLabel = new Label("Please choose from the following options:");
         subLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #FFFFFF; -fx-font-weight: bold;");
 
@@ -151,7 +149,7 @@ public class DMSApp extends Application {
         Button notContactedButton = new Button("View Not Contacted Students");
         notContactedButton.setOnAction(e -> StudentManagement.notContacted());
 
-        // Style the buttons for a cohesive look
+        // Style the buttons
         for (Button button : new Button[]{
                 addStudentManualButton, addStudentFileButton, removeStudentButton,
                 updateStudentButton, viewOneStudentButton, viewAllStudentsButton, notContactedButton
@@ -173,13 +171,12 @@ public class DMSApp extends Application {
                 updateStudentButton, viewOneStudentButton, viewAllStudentsButton, notContactedButton
         );
 
-        // Wrap the button layout in a StackPane for the semi-transparent background
         StackPane centerPane = new StackPane(buttonLayout);
         centerPane.setStyle("-fx-background-color: rgba(255, 255, 255, 0.3); " +
                 "-fx-background-radius: 10; " +
                 "-fx-padding: 20;");
 
-        // Now add a ScrollPane so the user can scroll if needed
+        // Now add a ScrollPane
         ScrollPane scrollPane = new ScrollPane(centerPane);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);

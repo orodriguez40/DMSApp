@@ -10,18 +10,29 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnector {
-    private static Connection connection = null;
+    private static String server;
+    private static String database;
+    private static String dbUser;
+    private static String dbPass;
 
-    // Connects to the MySQL database using user-provided details.
-    public static void connect(String server, String database, String dbUser, String dbPassword) throws SQLException {
-        // Concatenated string to ask user for database information.
-        String connectionUrl = "jdbc:mysql://" + server + "/" + database;
-        connection = DriverManager.getConnection(connectionUrl, dbUser, dbPassword);
+
+     //Stores the database credentials for use in getConnection().
+     //Call this once after the user enters their details.
+    public static void setCredentials(String server, String database, String dbUser, String dbPass) {
+        DatabaseConnector.server = server;
+        DatabaseConnector.database = database;
+        DatabaseConnector.dbUser = dbUser;
+        DatabaseConnector.dbPass = dbPass;
     }
 
-    // Returns the active connection.
-    public static Connection getConnection() {
-
-        return connection;
+     // Creates and returns a new Connection object using the stored credentials.
+     // This method is called every time you need to interact with the database.
+    public static Connection getConnection() throws SQLException {
+        if (server == null || database == null || dbUser == null || dbPass == null) {
+            throw new SQLException("Database credentials have not been set.");
+        }
+        // Build the JDBC URL.
+        String url = "jdbc:mysql://" + server + "/" + database;
+        return DriverManager.getConnection(url, dbUser, dbPass);
     }
 }
