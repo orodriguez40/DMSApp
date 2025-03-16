@@ -1,15 +1,21 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/02/2025
+// 03/30/2025
 
 // UserInput Class:
 // This class handles all user inputs and confirmations.
 
+// Imported Libraries
 import javafx.scene.control.Alert;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
-import java.util.Objects;
+
 
 public class UserInput {
 
@@ -65,11 +71,22 @@ public class UserInput {
 
     // Validates ID format and uniqueness.
     public static boolean manualIDInput(int id) {
-        return handleValidation(() ->
-                id >= 10000000 && id <= 99999999 &&
-                        StudentManagement.students.stream().noneMatch(student -> student.getId() == id)
-        );
-
+        if (id < 10000000 || id > 99999999) {
+            return false;
+        }
+        // Checks if ID is unique in the database.
+        String query = "SELECT COUNT(*) FROM students WHERE id = ?";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+        } catch (SQLException e) {
+            handleException(e);
+        }
+        return false;
     }
 
     // Checks if first name has at most 15 characters and only letters.
@@ -89,9 +106,27 @@ public class UserInput {
 
     // Checks for email format and uniqueness.
     public static boolean emailInput(String email) {
-        return handleValidation(() -> email.matches("^[A-Za-z][A-Za-z0-9._-]*(?<![._-])@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$") &&
-                StudentManagement.students.stream().noneMatch(student -> Objects.equals(student.getEmail(), email)));
+        if (email == null || email.isEmpty()) {
+            return false;
+        }
+        if (!email.matches("^[A-Za-z][A-Za-z0-9._-]*(?<![._-])@[A-Za-z]+(?:\\.[A-Za-z]{2,3})$")) {
+            return false;
+        }
+        // Checks if email is unique within the database.
+        String query = "SELECT COUNT(*) FROM students WHERE email = ?";
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+        } catch (SQLException e) {
+            handleException(e);
+        }
+        return false;
     }
+
 
     // Checks for valid gpa.
     public static boolean gpaInput(double gpa) {
@@ -121,35 +156,35 @@ public class UserInput {
     public static Student searchStudentByID(String input) {
         try {
             int id = Integer.parseInt(input);
-            // Check if ID is exactly 8 digits.
-            if (id >= 10000000 && id <= 99999999) {
-                // Find the Student by ID.
-                Student foundStudent = StudentManagement.students.stream()
-                        .filter(student -> student.getId() == id)
-                        .findFirst()
-                        .orElse(null); // Return null if no student is found.
-
-                // If student is found.
-                if (foundStudent != null) {
-                    return foundStudent; // Return the found student.
+            if (id < 10000000 || id > 99999999) {
+                showAlert("Invalid ID", "ID must be exactly 8 digits.");
+                return null;
+            }
+            String query = "SELECT * FROM students WHERE id = ?";
+            try (Connection conn = DatabaseConnector.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setInt(1, id);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return new Student(
+                            rs.getInt("id"),
+                            rs.getString("firstName"),
+                            rs.getString("lastName"),
+                            rs.getString("phoneNumber"),
+                            rs.getString("email"),
+                            rs.getDouble("gpa"),
+                            rs.getBoolean("isContacted")
+                    );
                 } else {
-                    // No student found with the given ID.
-                    showAlert("Error", "\nNo student found with the given ID.");
-                    return null; // Exits to the main menu.
+                    showAlert("Error", "No student found with the given ID.");
                 }
-            } else {
-                // Invalid ID. It must be exactly 8 digits.
-                showAlert("Invalid ID", "It must be exactly 8 digits.");
             }
         } catch (NumberFormatException e) {
-            showAlert("Invalid input", "Please enter a valid 8-digit number (exclude the 'S' in the ID).");
-        } catch (NoSuchElementException | IllegalStateException e) {
-            showAlert("Unexpected input issue", "Please try again.");
+            showAlert("Invalid Input", "Please enter a valid 8-digit number (exclude the 'S' in the ID).");
         } catch (Exception e) {
-            showAlert("Unexpected error occurred", "Please try again.");
+            showAlert("Unexpected Error", "Please try again. " + e.getMessage());
         }
-
-        return null; // Indicate failure
+        return null;
     }
 
     // Utility method to show a simple alert with a title and message.

@@ -1,13 +1,14 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/02/2025
+// 03/30/2025
 
 // FileHandler Class:
 // This class handles file operations and conditions for adding students.
+// In this Phase 4 update, it reads a text file and inserts valid student records directly into the database.
+// It now also checks for duplicate IDs and emails within the file and against the database.
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
@@ -19,13 +20,18 @@ import javafx.geometry.Pos;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileHandler {
 
     // Method is called to validate file contents and upload student information from a text file.
-    public static boolean addStudentsByFile(String filePath, List<Student> students) {
+    public static boolean addStudentsByFile(String filePath) {
         // Lists to store invalid entries per category
         List<String> invalidEntries = new ArrayList<>();
         List<String> invalidIDs = new ArrayList<>();
@@ -136,33 +142,36 @@ public class FileHandler {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
-        // Duplicate check against already added students (global list)
-        Set<Integer> existingIds = students.stream()
-                .map(Student::getId)
-                .collect(Collectors.toSet());
-        Set<String> existingEmails = students.stream()
-                .map(Student::getEmail)
-                .collect(Collectors.toSet());
-
-        // Separate duplicates by ID and by Email from the file valid students
-        List<Student> duplicateStudentsByID = fileValidStudents.stream()
-                .filter(student -> duplicateIDsInFile.contains(student.getId()) || existingIds.contains(student.getId()))
-                .collect(Collectors.toList());
-
-        List<Student> duplicateStudentsByEmail = fileValidStudents.stream()
-                .filter(student -> duplicateEmailsInFile.contains(student.getEmail()) || existingEmails.contains(student.getEmail()))
-                .collect(Collectors.toList());
-
-        // Display duplicate entries regardless of confirmation.
-        if (!duplicateStudentsByID.isEmpty()) {
-            showDuplicateIDs(duplicateStudentsByID);
-        }
-        if (!duplicateStudentsByEmail.isEmpty()) {
-            showDuplicateEmails(duplicateStudentsByEmail);
+        // Retrieve existing student IDs and emails from the database
+        Set<Integer> existingIds = new HashSet<>();
+        Set<String> existingEmails = new HashSet<>();
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, email FROM students")) {
+            while (rs.next()) {
+                existingIds.add(rs.getInt("id"));
+                existingEmails.add(rs.getString("email"));
+            }
+        } catch (SQLException e) {
+            showAlert("Database Error", "Error retrieving existing student records: " + e.getMessage());
+            return false;
         }
 
-        // Remove duplicates from the list of valid students.
-        // (If a student appears as a duplicate by ID or Email, exclude them from addition.)
+        // Display duplicates found in the database
+        List<Student> duplicateStudentsByDBId = fileValidStudents.stream()
+                .filter(student -> existingIds.contains(student.getId()))
+                .collect(Collectors.toList());
+        if (!duplicateStudentsByDBId.isEmpty()) {
+            showDuplicateIDs(duplicateStudentsByDBId);
+        }
+        List<Student> duplicateStudentsByDBEmail = fileValidStudents.stream()
+                .filter(student -> existingEmails.contains(student.getEmail()))
+                .collect(Collectors.toList());
+        if (!duplicateStudentsByDBEmail.isEmpty()) {
+            showDuplicateEmails(duplicateStudentsByDBEmail);
+        }
+
+        // Remove duplicates from the list of valid students (both within file and with database)
         List<Student> uniqueValidStudents = fileValidStudents.stream()
                 .filter(student -> !(duplicateIDsInFile.contains(student.getId())
                         || duplicateEmailsInFile.contains(student.getEmail())
@@ -170,20 +179,37 @@ public class FileHandler {
                         || existingEmails.contains(student.getEmail())))
                 .collect(Collectors.toList());
 
-        // Confirmation logic for unique valid students using the new valid students window
+        // Confirmation logic for unique valid students
         if (!uniqueValidStudents.isEmpty()) {
             StringBuilder message = new StringBuilder("Valid students to be added:\n");
             uniqueValidStudents.forEach(student -> message.append(student.toString()).append("\n"));
-            // This flag will be set by the confirmation dialog
             boolean[] confirmed = new boolean[1];
             showValidStudents(message.toString(), confirmed);
             if (confirmed[0]) {
-                students.addAll(uniqueValidStudents);
-                showAlert("Success", "Students Added Successfully!");
-                return true; // Students were added
+                // Insert each student into the database
+                try (Connection conn = DatabaseConnector.getConnection()) {
+                    String insertSQL = "INSERT INTO students (id, firstName, lastName, phoneNumber, email, gpa, isContacted) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    for (Student s : uniqueValidStudents) {
+                        try (PreparedStatement stmt = conn.prepareStatement(insertSQL)) {
+                            stmt.setInt(1, s.getId());
+                            stmt.setString(2, s.getFirstName());
+                            stmt.setString(3, s.getLastName());
+                            stmt.setString(4, s.getPhoneNumber());
+                            stmt.setString(5, s.getEmail());
+                            stmt.setDouble(6, s.getGpa());
+                            stmt.setBoolean(7, s.getIsContacted());
+                            stmt.executeUpdate();
+                        }
+                    }
+                    showAlert("Success", "Students Added Successfully!");
+                    return true;
+                } catch (SQLException e) {
+                    showAlert("Database Error", "Failed to insert students: " + e.getMessage());
+                    return false;
+                }
             } else {
                 showAlert("Cancellation", "Student upload has been cancelled. Students were not added.");
-                return false; // Operation cancelled by the user
+                return false;
             }
         } else {
             showAlert("No Valid Students", "No valid students found to add.");
@@ -193,13 +219,11 @@ public class FileHandler {
         return false;
     }
 
-
-     //Displays invalid (or incorrectly formatted) entries in a scrollable window.
-     //"Continue" button is added so that the user can click it (or exit) to continue.
+    // Displays invalid (or incorrectly formatted) entries in a scrollable window.
     private static void showInvalidEntries(List<String> invalidEntries, List<String> invalidIDs,
-                                                    List<String> invalidFirstNames, List<String> invalidLastNames,
-                                                    List<String> invalidPhoneNumbers, List<String> invalidEmails,
-                                                    List<String> invalidGPA, List<String> invalidContacted) {
+                                           List<String> invalidFirstNames, List<String> invalidLastNames,
+                                           List<String> invalidPhoneNumbers, List<String> invalidEmails,
+                                           List<String> invalidGPA, List<String> invalidContacted) {
 
         if (!invalidIDs.isEmpty() || !invalidFirstNames.isEmpty() || !invalidLastNames.isEmpty() || !invalidPhoneNumbers.isEmpty() ||
                 !invalidEmails.isEmpty() || !invalidGPA.isEmpty() || !invalidContacted.isEmpty() || !invalidEntries.isEmpty()) {
@@ -257,7 +281,6 @@ public class FileHandler {
         scrollableWindow("Duplicate Emails", message.toString());
     }
 
-
     private static void showValidStudents(String content, boolean[] confirmedHolder) {
         Stage validStage = new Stage();
         validStage.setTitle("Valid Students");
@@ -270,10 +293,9 @@ public class FileHandler {
 
         Button continueButton = new Button("Continue");
         continueButton.setOnAction(e -> {
-            // Open a non-modal confirmation dialog.
+            // Open a confirmation dialog.
             Stage confirmStage = new Stage();
             confirmStage.setTitle("Confirm Upload");
-            // Set modality to NONE so it does not block the valid students window.
             confirmStage.initModality(Modality.NONE);
             Label confirmLabel = new Label("Are you sure you want to add these students?");
 
@@ -304,7 +326,7 @@ public class FileHandler {
         validStage.showAndWait();
     }
 
-    // Helper method to diplay list of valid and invalid students.
+    // Helper method to display a scrollable window.
     private static void scrollableWindow(String title, String content) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
@@ -327,11 +349,9 @@ public class FileHandler {
         window.showAndWait();
     }
 
-
-
     // Utility method to show a simple alert with a title and message.
     public static void showAlert(String title, String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

@@ -1,6 +1,6 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/02/2025
+// 03/30/2025
 
 // StudentManagement Class:
 // This class manages all CRUD functions and the custom action.
@@ -143,20 +143,23 @@ public class StudentManagement {
                     throw new IllegalArgumentException("Invalid input: Please enter 'true' for yes or 'false' for no.");
                 }
 
+
+                // Adds student to the students array list to display to the user.
+                Student newStudent = UserInput.getStudentInfo(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
+
                 // Ask for confirmation before adding student.
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation");
                 confirmationAlert.setHeaderText("Add Student");
                 confirmationAlert.setContentText("Are you sure you want to add this student?");
+                assert newStudent != null;
+                confirmationAlert.setContentText(newStudent.toString());
 
                 // Show the alert and wait for user response.
                 Optional<ButtonType> result = confirmationAlert.showAndWait();
 
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     // If user clicked 'Yes' (OK), add the student.
-                    // Adds student to the students array list to display to the user.
-                    Student newStudent = UserInput.getStudentInfo(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
-
                     // Insert student into the database.
                     String insertSQL = "INSERT INTO students (id, firstName, lastName, phoneNumber, email, gpa, isContacted) VALUES (?, ?, ?, ?, ?, ?, ?)";
                     try (Connection conn = DatabaseConnector.getConnection();
@@ -196,9 +199,7 @@ public class StudentManagement {
             }
         });
 
-
-
-                    // Clears fields
+        // Clears fields
         clearButton.setOnAction(e -> {
             idField.clear();
             firstNameField.clear();
@@ -276,7 +277,7 @@ public class StudentManagement {
                 showAlert("Error", "Please select a file before uploading.");
             } else {
                 // Check for valid students and display them
-                FileHandler.addStudentsByFile(filePath, students);
+                FileHandler.addStudentsByFile(filePath);
                 filePathField.clear();
 
             }
@@ -316,25 +317,21 @@ public class StudentManagement {
         Button deleteButton = new Button("Delete");
         Button clearButton = new Button("Clear");
 
-        //If student is found, it is pass as an Atomic Reference for deletion.
-        AtomicReference<Student> foundStudentRef = new AtomicReference<>();
+        // If student is found, it is passed as an array for deletion.
+        final Student[] foundStudent = {null};
 
         // Action for the Search button
         searchButton.setOnAction(e -> {
             String studentId = idField.getText().trim();
             if (!studentId.isEmpty()) {
-
-                Student findStudent = UserInput.searchStudentByID(studentId);
-                foundStudentRef.set(findStudent); // Store it in AtomicReference
-
+                foundStudent[0] = UserInput.searchStudentByID(studentId);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                if (findStudent != null) {
+                if (foundStudent[0] != null) {
                     alert.setTitle("Student found");
                     alert.setHeaderText(null);
-                    alert.setContentText(findStudent.toString());
+                    alert.setContentText(foundStudent[0].toString());
                     alert.showAndWait();
                 }
-
             } else {
                 showAlert("Error", "Please enter a student ID to search.");
             }
@@ -342,12 +339,12 @@ public class StudentManagement {
 
         // Action for the Delete button
         deleteButton.setOnAction(e -> {
-            if (foundStudentRef.get() != null) {
+            if (foundStudent[0] != null) {
                 // Confirmation alert
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirm Deletion");
                 confirmationAlert.setHeaderText("Are you sure you want to delete this student?");
-                confirmationAlert.setContentText(foundStudentRef.get().toString());
+                confirmationAlert.setContentText(foundStudent[0].toString());
 
                 // Add Yes and No options
                 ButtonType yesButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
@@ -356,15 +353,21 @@ public class StudentManagement {
 
                 // Show the confirmation window
                 Optional<ButtonType> result = confirmationAlert.showAndWait();
-
                 if (result.isPresent() && result.get() == yesButton) {
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Deletion Successful");
-                    successAlert.setHeaderText(null);
-                    successAlert.setContentText("Student successfully deleted:\n" + foundStudentRef.get().toString());
-                    successAlert.showAndWait();
-                    students.remove(foundStudentRef.get());
-                    idField.clear();
+                    String deleteSQL = "DELETE FROM students WHERE id = ?";
+                    try (Connection conn = DatabaseConnector.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(deleteSQL)) {
+                        stmt.setInt(1, foundStudent[0].getId());
+                        stmt.executeUpdate();
+                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                        successAlert.setTitle("Deletion Successful");
+                        successAlert.setHeaderText(null);
+                        successAlert.setContentText("Student successfully deleted:\n" + foundStudent[0].toString());
+                        successAlert.showAndWait();
+                        idField.clear();
+                    } catch (SQLException ex) {
+                        showAlert("Database Error", "Failed to delete student: " + ex.getMessage());
+                    }
                 } else {
                     showAlert("Cancellation", "Deletion canceled.\n");
                 }
