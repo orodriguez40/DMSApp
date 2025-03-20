@@ -2,10 +2,6 @@
 // CEN-3024C-24204
 // 03/30/2025
 
-// UserInput Class:
-// This class handles all user inputs and confirmations.
-
-// Imported Libraries
 import javafx.scene.control.Alert;
 
 import java.sql.Connection;
@@ -16,10 +12,28 @@ import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
-
+/**
+ * UserInput Class:
+ * <p>
+ * This class handles all user inputs and confirmations.
+ * It validates student information, ensures data uniqueness,
+ * and provides methods to search for students in the database.
+ * </p>
+ */
 public class UserInput {
 
-    // Method is called ot validate manual user input.
+    /**
+     * Validates manual user input and returns a Student object if all validations pass.
+     *
+     * @param id          the student's ID.
+     * @param firstName   the student's first name.
+     * @param lastName    the student's last name.
+     * @param phoneNumber the student's phone number.
+     * @param email       the student's email address.
+     * @param gpa         the student's GPA.
+     * @param isContacted indicates whether the student has been contacted.
+     * @return a Student object with the provided information, or null if validation fails.
+     */
     public static Student getStudentInfo(int id, String firstName, String lastName, String phoneNumber, String email, double gpa, boolean isContacted) {
         try {
             if (!(manualIDInput(id))) {
@@ -58,7 +72,11 @@ public class UserInput {
         }
     }
 
-    // Displays all exceptions made by the user.
+    /**
+     * Displays exceptions encountered during input validation.
+     *
+     * @param e the exception to handle.
+     */
     private static void handleException(Exception e) {
         if (e instanceof InputMismatchException) {
             System.out.println("Invalid input. Please enter the correct data type.");
@@ -69,7 +87,12 @@ public class UserInput {
         }
     }
 
-    // Validates ID format and uniqueness.
+    /**
+     * Validates the ID format and uniqueness.
+     *
+     * @param id the student's ID.
+     * @return true if the ID is valid and unique, false otherwise.
+     */
     public static boolean manualIDInput(int id) {
         if (id < 10000000 || id > 99999999) {
             return false;
@@ -89,22 +112,42 @@ public class UserInput {
         return false;
     }
 
-    // Checks if first name has at most 15 characters and only letters.
+    /**
+     * Validates the first name (at most 15 characters and only letters).
+     *
+     * @param firstName the student's first name.
+     * @return true if valid, false otherwise.
+     */
     public static boolean firstNameInput(String firstName) {
         return handleValidation(() -> firstName != null && !firstName.isEmpty() && firstName.length() <= 15 && !firstName.matches(".*\\d.*") && firstName.matches("[a-zA-Z]+"));
     }
 
-    // Checks if last name has at most 25 characters and only letters.
+    /**
+     * Validates the last name (at most 25 characters and only letters).
+     *
+     * @param lastName the student's last name.
+     * @return true if valid, false otherwise.
+     */
     public static boolean lastNameInput(String lastName) {
         return handleValidation(() -> lastName != null && !lastName.isEmpty() && lastName.length() <= 25 && !lastName.matches(".*\\d.*") && lastName.matches("[a-zA-Z]+"));
     }
 
-    // Check if number has 10 digits and in the correct format.
+    /**
+     * Validates the phone number (must follow xxx-xxx-xxxx format).
+     *
+     * @param phoneNumber the student's phone number.
+     * @return true if valid, false otherwise.
+     */
     public static boolean phoneNumberInput(String phoneNumber) {
         return handleValidation(() -> phoneNumber.matches("\\d{3}-\\d{3}-\\d{4}"));
     }
 
-    // Checks for email format and uniqueness.
+    /**
+     * Validates the email format and uniqueness.
+     *
+     * @param email the student's email address.
+     * @return true if valid and unique, false otherwise.
+     */
     public static boolean emailInput(String email) {
         if (email == null || email.isEmpty()) {
             return false;
@@ -127,17 +170,32 @@ public class UserInput {
         return false;
     }
 
-
-    // Checks for valid gpa.
+    /**
+     * Validates the GPA (must be between 0 and 1.9).
+     *
+     * @param gpa the student's GPA.
+     * @return true if valid, false otherwise.
+     */
     public static boolean gpaInput(double gpa) {
         return handleValidation(() -> gpa >= 0 && gpa <= 1.9);
     }
 
-    // Checks for valid contacted status.
+    /**
+     * Checks for a valid contacted status.
+     *
+     * @param isContacted the contacted status.
+     * @return the contacted status if valid, or null otherwise.
+     */
     public static Boolean isContactedConfirmation(Boolean isContacted) {
         return handleValidation(() -> isContacted != null) ? isContacted : null;
     }
 
+    /**
+     * Helper method for input validations using a lambda.
+     *
+     * @param validationFunction the validation function to execute.
+     * @return true if validation passes, false otherwise.
+     */
     private static boolean handleValidation(ValidationFunction validationFunction) {
         try {
             return validationFunction.validate();
@@ -152,7 +210,15 @@ public class UserInput {
         boolean validate();
     }
 
-    // Method searches for a student based on their ID, displays the information, and returns the student.
+    /**
+     * Searches for a student based on their ID.
+     * <p>
+     * Displays the information and returns the corresponding Student object if found.
+     * </p>
+     *
+     * @param input the student's ID as a string.
+     * @return the Student object if found, or null if not found.
+     */
     public static Student searchStudentByID(String input) {
         try {
             int id = Integer.parseInt(input);
@@ -187,7 +253,12 @@ public class UserInput {
         return null;
     }
 
-    // Utility method to show a simple alert with a title and message.
+    /**
+     * Utility method to show a simple alert with a title and message.
+     *
+     * @param title   the title of the alert.
+     * @param message the message to display.
+     */
     public static void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -195,5 +266,4 @@ public class UserInput {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 }

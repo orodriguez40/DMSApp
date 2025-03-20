@@ -1,11 +1,6 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/30/2025
-
-// DMSApp Class (Main application):
-// This version eliminates the separate login screen.
-// Users now only enter database connection details which serve as the authentication.
-// If the connection is successful, the main menu (with CRUD options) is displayed.
+// 04/03/2025
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -19,16 +14,40 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
+/**
+ * DMSApp Class:
+ * Main application class for the Success University DMS.
+ * <p>
+ * This version eliminates the separate login screen.
+ * Users now only enter database connection details which serve as the authentication.
+ * If the connection is successful, the main menu (with CRUD options) is displayed.
+ * </p>
+ *
+ * @author Otoniel
+ * @version 03/30/2025
+ */
 public class DMSApp extends Application {
 
+    /**
+     * The main page for the user to login.
+     *
+     * @param primaryStage the primary stage for this application.
+     */
     @Override
     public void start(Stage primaryStage) {
         // Directly prompt the user for database connection details.
         databaseConnection(primaryStage);
     }
 
-    // Prompts the user to enter MySQL database connection details.
-    // These credentials serve as the authentication for using the DMS.
+    /**
+     * Prompts the user to enter MySQL database connection details.
+     * <p>
+     * These credentials serve as the authentication for using the DMS.
+     * </p>
+     *
+     * @param primaryStage the primary stage of the application.
+     *
+     */
     private void databaseConnection(Stage primaryStage) {
         Stage dbStage = new Stage();
         dbStage.setTitle("Success University DMS");
@@ -94,7 +113,11 @@ public class DMSApp extends Application {
         dbStage.showAndWait();
     }
 
-    // Displays the main menu with CRUD options.
+    /**
+     * Displays the main menu with CRUD options.
+     *
+     * @param primaryStage the primary stage of the application.
+     */
     private void showMainMenu(Stage primaryStage) {
         // Create a BorderPane to hold a top banner and the main content
         BorderPane mainLayout = new BorderPane();
@@ -192,7 +215,12 @@ public class DMSApp extends Application {
         primaryStage.show();
     }
 
+    /**
+     * The main method which launches the JavaFX application
+     *
+     * @param args the command line arguments.
+     */
     public static void main(String[] args) {
-        launch(args); // Launch the JavaFX application
+        launch(args);
     }
 }

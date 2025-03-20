@@ -1,11 +1,7 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/30/2025
+// 04/03/2025
 
-// StudentManagement Class:
-// This class manages all CRUD functions and the custom action.
-
-// Imported Libraries
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,12 +16,22 @@ import java.sql.*;
 import java.util.*;
 import java.util.Optional;
 
+/**
+ * StudentManagement Class:
+ * Manages all CRUD functions and the custom action.
+ * <p>
+ * This class handles adding, updating, deleting, and viewing students,
+ * both manually and via file upload, and also displays students that have not been contacted.
+ * </p>
+ */
 public class StudentManagement {
 
     // Attribute to store all Students in an ArrayList (for display purposes).
     static final List<Student> students = new ArrayList<>();
 
-    // Method is called to add a student manually.
+    /**
+     * Method is called to add a student manually.
+     */
     public static void addStudentManual() {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -121,7 +127,6 @@ public class StudentManagement {
                     throw new IllegalArgumentException("Email is already in use: Email must be unique.");
                 }
 
-
                 // Validates GPA.
                 if (!gpaField.getText().matches("-?\\d+(\\.\\d+)?")) {
                     throw new IllegalArgumentException("Invalid input: Please enter a double number (example 1.0).");
@@ -139,7 +144,6 @@ public class StudentManagement {
                 if (!contactedField.getText().equalsIgnoreCase("true") && !contactedField.getText().equalsIgnoreCase("false")) {
                     throw new IllegalArgumentException("Invalid input: Please enter 'true' for yes or 'false' for no.");
                 }
-
 
                 // Adds student to the students array list to display to the user.
                 Student newStudent = UserInput.getStudentInfo(id, firstName, lastName, phoneNumber, email, gpa, isContacted);
@@ -233,8 +237,9 @@ public class StudentManagement {
         popupStage.showAndWait();
     }
 
-
-    // Method is called to add students by file upload.
+    /**
+     * Method is called to add students by file upload.
+     */
     public static void addStudentFile() {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
@@ -258,7 +263,6 @@ public class StudentManagement {
             File selectedFile = fileChooser.showOpenDialog(popupStage);
             if (selectedFile != null) {
                 filePathField.setText(selectedFile.getAbsolutePath());
-
             }
         });
 
@@ -276,7 +280,6 @@ public class StudentManagement {
                 // Check for valid students and display them
                 FileHandler.addStudentsByFile(filePath);
                 filePathField.clear();
-
             }
         });
 
@@ -295,10 +298,11 @@ public class StudentManagement {
         Scene scene = new Scene(layout, 350, 250);
         popupStage.setScene(scene);
         popupStage.showAndWait();
-
     }
 
-    // Method is called to delete student from DMS database.
+    /**
+     * Method is called to delete a student from the DMS database.
+     */
     public static void removeStudent() {
         // Create a new Stage for the popup
         Stage popupStage = new Stage();
@@ -393,8 +397,9 @@ public class StudentManagement {
         popupStage.showAndWait(); // Show the popup and wait for it to close
     }
 
-
-    // Method is called to update student information.
+    /**
+     * Method is called to update student information.
+     */
     public static void updateStudent() {
         // Create a new Stage for the ID search popup
         Stage popupStage = new Stage();
@@ -662,7 +667,7 @@ public class StudentManagement {
                     }
                 });
 
-                // Clears all filed values.
+                // Clears all field values.
                 clearButtonUpdate.setOnAction(c -> {
                     idFieldUpdate.clear();
                     firstNameFieldUpdate.clear();
@@ -725,7 +730,9 @@ public class StudentManagement {
         popupStage.showAndWait();
     }
 
-    // Method is called to search and view one student.
+    /**
+     * Method is called to search and view one student.
+     */
     public static void viewOneStudent() {
         // Create a new Stage for the popup.
         Stage popupStage = new Stage();
@@ -760,7 +767,6 @@ public class StudentManagement {
             }
         });
 
-
         // Action for the Clear button.
         clearButton.setOnAction(e -> idField.clear());
 
@@ -780,7 +786,9 @@ public class StudentManagement {
         popupStage.showAndWait(); // Show the popup and wait for it to close
     }
 
-    // Method is called to view all students.
+    /**
+     * Method is called to view all students.
+     */
     public static void viewAllStudents() {
         StringBuilder studentsStr = new StringBuilder();
         String selectSQL = "SELECT * FROM students ORDER BY lastName";
@@ -834,7 +842,9 @@ public class StudentManagement {
         studentStage.show();
     }
 
-    // Method to view students who have not been contacted and display the GPA improvement needed.
+    /**
+     * Method to view students who have not been contacted and display the GPA improvement needed.
+     */
     public static void notContacted() {
         double targetGPA = 2.0;
         String selectSQL = "SELECT * FROM students WHERE isContacted = false ORDER BY lastName";
@@ -891,8 +901,12 @@ public class StudentManagement {
         stage.show();
     }
 
-
-    // Helper method for input validation.
+    /**
+     * Helper method for input validation that displays an alert with the provided title and message.
+     *
+     * @param title   the title of the alert.
+     * @param message the message to display in the alert.
+     */
     static void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

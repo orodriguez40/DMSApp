@@ -1,11 +1,6 @@
 // Otoniel Rodriguez-Perez
 // CEN-3024C-24204
-// 03/30/2025
-
-// FileHandler Class:
-// This class handles file operations and conditions for adding students.
-// In this Phase 4 update, it reads a text file and inserts valid student records directly into the database.
-// It now also checks for duplicate IDs and emails within the file and against the database.
+// 04/03/2025
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -28,9 +23,22 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * FileHandler Class:
+ * <p>
+ * This class handles file operations and conditions for adding students.
+ * In this Phase 4 update, it reads a text file and inserts valid student records directly into the database.
+ * It now also checks for duplicate IDs and emails within the file and against the database.
+ * </p>
+ */
 public class FileHandler {
 
-    // Method is called to validate file contents and upload student information from a text file.
+    /**
+     * Validates file contents and uploads student information from a text file.
+     *
+     * @param filePath the path of the text file.
+     * @return true if the upload is successful, false otherwise.
+     */
     public static boolean addStudentsByFile(String filePath) {
         // Lists to store invalid entries per category
         List<String> invalidEntries = new ArrayList<>();
@@ -219,7 +227,18 @@ public class FileHandler {
         return false;
     }
 
-    // Displays invalid (or incorrectly formatted) entries in a scrollable window.
+    /**
+     * Displays invalid (or incorrectly formatted) entries in a scrollable window.
+     *
+     * @param invalidEntries    list of rows with incorrect formatting.
+     * @param invalidIDs        list of rows with invalid IDs.
+     * @param invalidFirstNames list of rows with invalid first names.
+     * @param invalidLastNames  list of rows with invalid last names.
+     * @param invalidPhoneNumbers list of rows with invalid phone numbers.
+     * @param invalidEmails     list of rows with invalid emails.
+     * @param invalidGPA        list of rows with invalid GPA values.
+     * @param invalidContacted  list of rows with invalid contacted status.
+     */
     private static void showInvalidEntries(List<String> invalidEntries, List<String> invalidIDs,
                                            List<String> invalidFirstNames, List<String> invalidLastNames,
                                            List<String> invalidPhoneNumbers, List<String> invalidEmails,
@@ -267,20 +286,34 @@ public class FileHandler {
         }
     }
 
-    // Displays duplicate entries detected by ID.
+    /**
+     * Displays duplicate entries detected by ID in a scrollable window.
+     *
+     * @param duplicateStudents list of students with duplicate IDs.
+     */
     private static void showDuplicateIDs(List<Student> duplicateStudents) {
         StringBuilder message = new StringBuilder("Duplicate entries detected by ID:\n");
         duplicateStudents.forEach(student -> message.append(student.toString()).append("\n"));
         scrollableWindow("Duplicate IDs", message.toString());
     }
 
-    // Displays duplicate entries detected by Email.
+    /**
+     * Displays duplicate entries detected by Email in a scrollable window.
+     *
+     * @param duplicateStudents list of students with duplicate emails.
+     */
     private static void showDuplicateEmails(List<Student> duplicateStudents) {
         StringBuilder message = new StringBuilder("Duplicate entries detected by Email:\n");
         duplicateStudents.forEach(student -> message.append(student.toString()).append("\n"));
         scrollableWindow("Duplicate Emails", message.toString());
     }
 
+    /**
+     * Displays valid students to be added and asks for confirmation.
+     *
+     * @param content         the text content listing valid students.
+     * @param confirmedHolder a boolean array to hold the user's confirmation result.
+     */
     private static void showValidStudents(String content, boolean[] confirmedHolder) {
         Stage validStage = new Stage();
         validStage.setTitle("Valid Students");
@@ -326,7 +359,12 @@ public class FileHandler {
         validStage.showAndWait();
     }
 
-    // Helper method to display a scrollable window.
+    /**
+     * Helper method to display a scrollable window with given title and content.
+     *
+     * @param title   the window title.
+     * @param content the text content to display.
+     */
     private static void scrollableWindow(String title, String content) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
@@ -349,7 +387,12 @@ public class FileHandler {
         window.showAndWait();
     }
 
-    // Utility method to show a simple alert with a title and message.
+    /**
+     * Utility method to show a simple alert with a title and message.
+     *
+     * @param title   the title of the alert.
+     * @param message the message to display.
+     */
     public static void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
