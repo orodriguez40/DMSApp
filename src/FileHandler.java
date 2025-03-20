@@ -24,11 +24,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * FileHandler Class:
+ * FileHandler Class: This class handles file operations and conditions for adding students.
  * <p>
- * This class handles file operations and conditions for adding students.
- * In this Phase 4 update, it reads a text file and inserts valid student records directly into the database.
- * It now also checks for duplicate IDs and emails within the file and against the database.
+ * It reads a text file and inserts valid student records directly into the database.
+ * It  checks for duplicate IDs and emails within the file and against the database.
  * </p>
  */
 public class FileHandler {
